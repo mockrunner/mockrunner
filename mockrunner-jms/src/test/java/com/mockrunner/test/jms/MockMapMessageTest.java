@@ -88,7 +88,7 @@ public class MockMapMessageTest
             message.getInt("null");
             fail();
         }
-        catch(NumberFormatException exc)
+        catch(MessageFormatException exc)
         {
             //should throw exception
         }

@@ -207,7 +207,7 @@ public class MockStreamMessageTest
             message.readDouble();
             fail();
         }
-        catch(NullPointerException exc)
+        catch(MessageFormatException exc)
         {
             //should throw exception
         }

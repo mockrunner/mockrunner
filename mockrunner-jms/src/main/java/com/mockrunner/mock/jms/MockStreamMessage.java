@@ -27,7 +27,7 @@ public class MockStreamMessage extends MockMessage implements StreamMessage
         data = new Stack();
         remainingBytesPushed = false;
     }
-    
+
     public boolean readBoolean() throws JMSException
     {
         if(isInWriteMode())
@@ -39,7 +39,9 @@ public class MockStreamMessage extends MockMessage implements StreamMessage
             throw new MessageEOFException("No more data");
         }
         Object value = readObject();
-        if(null == value) return (boolean) null;
+        if(null == value) {
+            throw new MessageFormatException(getNullDatumMessage("boolean"));
+        }
         if(value instanceof Boolean)
         {
             return (Boolean) value;
@@ -62,7 +64,9 @@ public class MockStreamMessage extends MockMessage implements StreamMessage
             throw new MessageEOFException("No more data");
         }
         Object value = readObject();
-        if(null == value) return (byte) null;
+        if(null == value) {
+            throw new MessageFormatException(getNullDatumMessage("byte"));
+        }
         if(value instanceof Byte)
         {
             return (Byte) value;
@@ -85,7 +89,9 @@ public class MockStreamMessage extends MockMessage implements StreamMessage
             throw new MessageEOFException("No more data");
         }
         Object value = readObject();
-        if(null == value) return (short) null;
+        if(null == value) {
+            throw new MessageFormatException(getNullDatumMessage("short"));
+        }
         if((value instanceof Byte) || (value instanceof Short))
         {
             return ((Number)value).shortValue();
@@ -130,7 +136,9 @@ public class MockStreamMessage extends MockMessage implements StreamMessage
             throw new MessageEOFException("No more data");
         }
         Object value = readObject();
-        if(null == value) return (int) null;
+        if(null == value) {
+            throw new MessageFormatException(getNullDatumMessage("int"));
+        }
         if((value instanceof Byte) || (value instanceof Short) || (value instanceof Integer))
         {
             return ((Number)value).intValue();
@@ -153,7 +161,9 @@ public class MockStreamMessage extends MockMessage implements StreamMessage
             throw new MessageEOFException("No more data");
         }
         Object value = readObject();
-        if(null == value) return (long) null;
+        if(null == value) {
+            throw new MessageFormatException(getNullDatumMessage("long"));
+        }
         if((value instanceof Byte) || (value instanceof Short) || (value instanceof Integer) || (value instanceof Long))
         {
             return ((Number)value).longValue();
@@ -176,7 +186,9 @@ public class MockStreamMessage extends MockMessage implements StreamMessage
             throw new MessageEOFException("No more data");
         }
         Object value = readObject();
-        if(null == value) return (float) null;
+        if(null == value) {
+            throw new MessageFormatException(getNullDatumMessage("float"));
+        }
         if(value instanceof Float)
         {
             return (Float) value;
@@ -199,7 +211,9 @@ public class MockStreamMessage extends MockMessage implements StreamMessage
             throw new MessageEOFException("No more data");
         }
         Object value = readObject();
-        if(null == value) return (double) null;
+        if(null == value) {
+            throw new MessageFormatException(getNullDatumMessage("double"));
+        }
         if((value instanceof Float) || (value instanceof Double))
         {
             return ((Number)value).doubleValue();
@@ -519,5 +533,9 @@ public class MockStreamMessage extends MockMessage implements StreamMessage
     public String toString()
     {
         return this.getClass().getName() + ": " + data.toString();
+    }
+
+    private String getNullDatumMessage(String typename) {
+      return String.format("Cannot convert null to a %s.", typename);
     }
 }
