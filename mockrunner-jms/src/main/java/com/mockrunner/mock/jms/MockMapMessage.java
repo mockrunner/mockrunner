@@ -31,7 +31,7 @@ public class MockMapMessage extends MockMessage implements MapMessage
         Object value = getObject(name);
         if(null == value)
         {
-            return (boolean) null;
+            throw new MessageFormatException(getNullPropertyMessage(name));
         }
         if(value instanceof Boolean)
         {
@@ -49,7 +49,7 @@ public class MockMapMessage extends MockMessage implements MapMessage
         Object value = getObject(name);
         if(null == value)
         {
-            return (byte) null;
+            throw new MessageFormatException(getNullPropertyMessage(name));
         }
         if(value instanceof Byte)
         {
@@ -67,7 +67,7 @@ public class MockMapMessage extends MockMessage implements MapMessage
         Object value = getObject(name);
         if(null == value)
         {
-            return (short) null;
+            throw new MessageFormatException(getNullPropertyMessage(name));
         }
         if((value instanceof Byte) || (value instanceof Short))
         {
@@ -99,7 +99,7 @@ public class MockMapMessage extends MockMessage implements MapMessage
         Object value = getObject(name);
         if(null == value)
         {
-            return (int) null;
+            throw new MessageFormatException(getNullPropertyMessage(name));
         }
         if((value instanceof Byte) || (value instanceof Short) || (value instanceof Integer))
         {
@@ -117,7 +117,7 @@ public class MockMapMessage extends MockMessage implements MapMessage
         Object value = getObject(name);
         if(null == value)
         {
-            return (long) null;
+            throw new MessageFormatException(getNullPropertyMessage(name));
         }
         if((value instanceof Byte) || (value instanceof Short) || (value instanceof Integer) || (value instanceof Long))
         {
@@ -135,7 +135,7 @@ public class MockMapMessage extends MockMessage implements MapMessage
         Object value = getObject(name);
         if(null == value)
         {
-            return (float) null;
+            throw new MessageFormatException(getNullPropertyMessage(name));
         }
         if(value instanceof Float)
         {
@@ -153,7 +153,7 @@ public class MockMapMessage extends MockMessage implements MapMessage
         Object value = getObject(name);
         if(null == value)
         {
-            return (double) null;
+            throw new MessageFormatException(getNullPropertyMessage(name));
         }
         if((value instanceof Double) || (value instanceof Float))
         {

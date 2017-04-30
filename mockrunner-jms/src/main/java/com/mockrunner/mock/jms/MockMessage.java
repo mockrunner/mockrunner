@@ -203,7 +203,7 @@ public class MockMessage implements Message, Cloneable, Serializable
         Object value = getObjectProperty(name);
         if(value == null)
         {
-            return (boolean) null;
+            return false;
         }
         if(value instanceof String)
         {
@@ -221,7 +221,7 @@ public class MockMessage implements Message, Cloneable, Serializable
         Object value = getObjectProperty(name);
         if(value == null)
         {
-            return (byte) null;
+            throw new MessageFormatException(getNullPropertyMessage(name));
         }
         if(value instanceof String)
         {
@@ -239,7 +239,7 @@ public class MockMessage implements Message, Cloneable, Serializable
         Object value = getObjectProperty(name);
         if(value == null)
         {
-            return (short) null;
+            throw new MessageFormatException(getNullPropertyMessage(name));
         }
         if(value instanceof String)
         {
@@ -257,7 +257,7 @@ public class MockMessage implements Message, Cloneable, Serializable
         Object value = getObjectProperty(name);
         if(value == null)
         {
-            return (int) null;
+            throw new MessageFormatException(getNullPropertyMessage(name));
         }
         if(value instanceof String)
         {
@@ -275,7 +275,7 @@ public class MockMessage implements Message, Cloneable, Serializable
         Object value = getObjectProperty(name);
         if(value == null)
         {
-            return (long) null;
+            throw new MessageFormatException(getNullPropertyMessage(name));
         }
         if(value instanceof String)
         {
@@ -293,7 +293,7 @@ public class MockMessage implements Message, Cloneable, Serializable
         Object value = getObjectProperty(name);
         if(value == null)
         {
-            return (float) null;
+            throw new MessageFormatException(getNullPropertyMessage(name));
         }
         if(value instanceof String)
         {
@@ -311,7 +311,7 @@ public class MockMessage implements Message, Cloneable, Serializable
         Object value = getObjectProperty(name);
         if(value == null)
         {
-            return (double) null;
+            throw new MessageFormatException(getNullPropertyMessage(name));
         }
         if(value instanceof String)
         {
@@ -437,5 +437,9 @@ public class MockMessage implements Message, Cloneable, Serializable
     protected boolean isInWriteMode()
     {
         return isInWriteMode;
+    }
+
+    protected String getNullPropertyMessage(String name) {
+      return String.format("Property %s was null", name);
     }
 }
