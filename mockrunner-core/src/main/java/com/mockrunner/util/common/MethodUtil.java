@@ -25,20 +25,20 @@ public class MethodUtil
     {
         try
         {
-            Method method = object.getClass().getMethod(methodName, null);
-            return method.invoke(object, null);
-        } 
+            Method method = object.getClass().getMethod(methodName, (Class<?>[])null);
+            return method.invoke(object, (Object[])null);
+        }
         catch(Exception exc)
         {
             throw new NestedApplicationException(exc);
         }
     }
-    
+
     /**
      * Invokes the method with the specified name on the specified object
      * and throws a {@link com.mockrunner.base.NestedApplicationException},
      * if the invocation fails. The method must be public and must have
-     * exactly one paremeter of the type specified by the given
+     * exactly one parameter of the type specified by the given
      * <code>parameter</code>.
      * @param object the object the method is invoked from
      * @param methodName the name of the method
@@ -51,13 +51,13 @@ public class MethodUtil
         {
             Method method = object.getClass().getMethod(methodName, parameter.getClass());
             return method.invoke(object, parameter);
-        } 
+        }
         catch(Exception exc)
         {
             throw new NestedApplicationException(exc);
         }
     }
-    
+
     /**
      * Returns if the two specified methods are equal as
      * defined by <code>Method.equals()</code> except that
@@ -75,7 +75,7 @@ public class MethodUtil
         if(!method1.getReturnType().equals(method2.getReturnType())) return false;
         return Arrays.equals(method1.getParameterTypes(), method2.getParameterTypes());
     }
-    
+
     /**
      * Returns if <code>method2</code> overrides <code>method1</code>.
      * @param method1 method to be overridden
@@ -94,7 +94,7 @@ public class MethodUtil
         if(method1.getDeclaringClass().isInterface()) return false;
         return Arrays.equals(method1.getParameterTypes(), method2.getParameterTypes());
     }
-    
+
     /**
      * Returns all methods in <code>methods</code> that are overridden in
      * the specified class hierarchy. The returned <code>Set</code> contains
@@ -103,12 +103,12 @@ public class MethodUtil
      * @param methods the <code>Set</code> of methods
      * @return all overridden and overriding methods.
      */
-    public static Set getOverriddenMethods(Class clazz, Method[] methods)
+    public static Set<Method> getOverriddenMethods(Class<?> clazz, Method[] methods)
     {
-        Method[][] declaredMethods = MethodUtil.getMethodsSortedByInheritanceHierarchy(clazz); 
-        Set overridingMethods = new HashSet();
+        Method[][] declaredMethods = MethodUtil.getMethodsSortedByInheritanceHierarchy(clazz);
+        Set<Method> overridingMethods = new HashSet<>();
         for (Method currentAroundInvokeMethod : methods) {
-            Set currentOverridingMethods = new HashSet();
+            Set<Method> currentOverridingMethods = new HashSet<>();
             for (Method[] declaredMethod : declaredMethods) {
                 for (Method aDeclaredMethod : declaredMethod) {
                     if (MethodUtil.overrides(currentAroundInvokeMethod, aDeclaredMethod)) {
@@ -123,7 +123,7 @@ public class MethodUtil
         }
         return overridingMethods;
     }
-    
+
     /**
      * Returns the declared methods of the specified class whose names are matching
      * the specified regular expression.
@@ -131,18 +131,18 @@ public class MethodUtil
      * @param expr the regular expression
      * @return the matching methods
      */
-    public static Method[] getMatchingDeclaredMethods(Class theClass, String expr)
+    public static Method[] getMatchingDeclaredMethods(Class<?> theClass, String expr)
     {
         Method[] methods = theClass.getDeclaredMethods();
-        List resultList = new ArrayList();
+        List<Method> resultList = new ArrayList<Method>();
         for (Method method : methods) {
             if (StringUtil.matchesPerl5(method.getName(), expr, true)) {
                 resultList.add(method);
             }
         }
-        return (Method[])resultList.toArray(new Method[resultList.size()]);
+        return resultList.toArray(new Method[resultList.size()]);
     }
-    
+
     /**
      * Returns all non-static methods declared by the specified class and its
      * superclasses. The returned array contains the methods of all classes
@@ -151,19 +151,19 @@ public class MethodUtil
      * @param theClass the class whose methods are examined
      * @return the array of method arrays
      */
-    public static Method[][] getMethodsSortedByInheritanceHierarchy(Class theClass)
+    public static Method[][] getMethodsSortedByInheritanceHierarchy(Class<?> theClass)
     {
-        List hierarchyList = new ArrayList();
-        Class[] hierarchyClasses = ClassUtil.getInheritanceHierarchy(theClass);
-        for (Class hierarchyClass : hierarchyClasses) {
+        List<Method[]> hierarchyList = new ArrayList<>();
+        Class<?>[] hierarchyClasses = ClassUtil.getInheritanceHierarchy(theClass);
+        for (Class<?> hierarchyClass : hierarchyClasses) {
             addMethodsForClass(hierarchyList, hierarchyClass);
         }
-        return (Method[][])hierarchyList.toArray(new Method[hierarchyList.size()][]);
+        return hierarchyList.toArray(new Method[hierarchyList.size()][]);
     }
-    
-    private static void addMethodsForClass(List hierarchyList, Class clazz)
+
+    private static void addMethodsForClass(List<Method[]> hierarchyList, Class<?> clazz)
     {
-        List methodList = new ArrayList();
+        List<Method> methodList = new ArrayList<>();
         Method[] methods = clazz.getDeclaredMethods();
         for (Method method : methods) {
             if (!Modifier.isStatic(method.getModifiers())) {

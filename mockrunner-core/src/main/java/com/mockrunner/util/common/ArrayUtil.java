@@ -3,7 +3,6 @@ package com.mockrunner.util.common;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +25,7 @@ public class ArrayUtil
         }
         return list;
     }
-    
+
     /**
      * Returns a byte array containing the bytes from the <code>List</code>.
      * The <code>List</code> must contain <code>Byte</code> objects.
@@ -39,7 +38,7 @@ public class ArrayUtil
     {
         return getByteArrayFromList(data, 0);
     }
-    
+
     /**
      * Returns a byte array containing the bytes from the <code>List</code>.
      * The <code>List</code> must contain <code>Byte</code> objects.
@@ -53,7 +52,7 @@ public class ArrayUtil
     {
         return getByteArrayFromList(data, index, data.size() - index);
     }
-    
+
     /**
      * Returns a byte array containing the bytes from the <code>List</code>.
      * The <code>List</code> must contain <code>Byte</code> objects.
@@ -82,7 +81,7 @@ public class ArrayUtil
         }
         return byteData;
     }
-    
+
     /**
      * Copies the bytes from the specified array to the specified
      * <code>List</code> as <code>Byte</code> objects starting
@@ -96,7 +95,7 @@ public class ArrayUtil
     {
         addBytesToList(data, 0, data.length, list, index);
     }
-    
+
     /**
      * Copies the bytes from the specified array to the specified
      * <code>List</code> as <code>Byte</code> objects starting
@@ -138,7 +137,7 @@ public class ArrayUtil
     {
         return truncateArray(sourceArray, 0, len);
     }
-    
+
     /**
      * Returns a truncated copy of <i>sourceArray</i>. <i>len</i>
      * entries are copied starting at the specified index.
@@ -160,7 +159,7 @@ public class ArrayUtil
         System.arraycopy(sourceArray, index, targetArray, 0, len);
         return targetArray;
     }
-    
+
     /**
      * Returns a copy of the specified array. If <i>array</i>
      * is not an array, the object itself will be returned.
@@ -172,7 +171,7 @@ public class ArrayUtil
     public static Object copyArray(Object array)
     {
         if(!array.getClass().isArray()) return array;
-        Class componentType = array.getClass().getComponentType();
+        Class<?> componentType = array.getClass().getComponentType();
         int length = Array.getLength(array);
         Object copy = Array.newInstance(componentType, Array.getLength(array));
         for(int ii = 0; ii < length; ii++)
@@ -181,9 +180,9 @@ public class ArrayUtil
         }
         return copy;
     }
-    
+
     /**
-     * Returns an object array by wrapping primitive types. If the 
+     * Returns an object array by wrapping primitive types. If the
      * specified array is of primitive component type, an <code>Object[]</code>
      * with the corresponding wrapper component type is returned.
      * If the specified array is already an object array, the instance is
@@ -200,7 +199,7 @@ public class ArrayUtil
         {
             throw new IllegalArgumentException("sourceArray must be an array");
         }
-        Class componentType = sourceArray.getClass().getComponentType();
+        Class<?> componentType = sourceArray.getClass().getComponentType();
         if(!componentType.isPrimitive())
         {
             return (Object[])sourceArray;
@@ -209,7 +208,7 @@ public class ArrayUtil
         {
             componentType = Boolean.class;
         }
-        else if(componentType.equals(Byte.TYPE)) 
+        else if(componentType.equals(Byte.TYPE))
         {
             componentType = Byte.class;
         }
@@ -245,12 +244,12 @@ public class ArrayUtil
         }
         return targetArray;
     }
-    
+
     /**
-     * Returns a primitive array by unwrapping the corresponding types. If the 
-     * specified array is not an array of primitive wrapper types (e.g. <code>Integer[]</code>), 
+     * Returns a primitive array by unwrapping the corresponding types. If the
+     * specified array is not an array of primitive wrapper types (e.g. <code>Integer[]</code>),
      * an <code>IllegalArgumentException</code> will be thrown.
-     * If an array element is <code>null</code>, an <code>IllegalArgumentException</code> 
+     * If an array element is <code>null</code>, an <code>IllegalArgumentException</code>
      * will be thrown.
      * @param sourceArray the array
      * @return the corresponding primitive array
@@ -260,12 +259,12 @@ public class ArrayUtil
      */
     public static Object convertToPrimitiveArray(Object[] sourceArray)
     {
-        Class componentType = sourceArray.getClass().getComponentType();
+        Class<?> componentType = sourceArray.getClass().getComponentType();
         if(componentType.equals(Boolean.class))
         {
             componentType = Boolean.TYPE;
         }
-        else if(componentType.equals(Byte.class)) 
+        else if(componentType.equals(Byte.class))
         {
             componentType = Byte.TYPE;
         }
@@ -305,7 +304,7 @@ public class ArrayUtil
         }
         return targetArray;
     }
-    
+
     /**
      * Creates an array with a single object as component.
      * If the specified object is an array, it will be returned
@@ -321,11 +320,11 @@ public class ArrayUtil
         Array.set(array, 0, object);
         return array;
     }
-    
+
     /**
      * Compares the two specified arrays. If both passed objects are
-     * <code>null</code>, <code>true</code> is returned. If both passed 
-     * objects are not arrays, they are compared using <code>equals</code>. 
+     * <code>null</code>, <code>true</code> is returned. If both passed
+     * objects are not arrays, they are compared using <code>equals</code>.
      * Otherwise all array elements are compared using <code>equals</code>.
      * This method does not handle multidimensional arrays, i.e. if an
      * array contains another array, comparison is based on identity.
@@ -352,11 +351,11 @@ public class ArrayUtil
         }
         return true;
     }
-    
+
     /**
      * Returns a suitable hash code for the specified array. If the passed
      * object is <code>null</code>, <code>0</code> is returned.
-     * It is allowed to pass an object that is not an array, in this case, 
+     * It is allowed to pass an object that is not an array, in this case,
      * the hash code of the object will be returned. Otherwise the hash code
      * will be based on the array elements. <code>null</code> elements are
      * allowed.
@@ -378,7 +377,7 @@ public class ArrayUtil
         }
         return hashCode;
     }
-    
+
     /**
      * Returns the index of the first occurence of the
      * array <i>bytes</i> in the array <i>source</i>.
@@ -391,7 +390,7 @@ public class ArrayUtil
     {
         return indexOf(source, bytes, 0);
     }
-    
+
     /**
      * Returns the index of the first occurence of the
      * array <i>bytes</i> in the array <i>source</i>.
@@ -406,13 +405,13 @@ public class ArrayUtil
         if(index + bytes.length > source.length) return -1;
         for(int ii = index; ii <= source.length - bytes.length; ii++)
         {
-            int yy = 0; 
+            int yy = 0;
             while(yy < bytes.length && bytes[yy] == source[ii + yy]) yy++;
             if(yy == bytes.length) return ii;
         }
         return -1;
     }
-    
+
     /**
      * Ensures that each entry in the specified string array
      * is unique by adding a number to duplicate entries.
@@ -423,15 +422,15 @@ public class ArrayUtil
      */
     public static void ensureUnique(String[] values)
     {
-        Map nameMap = collectOccurences(values);
+        Map<String, Integer> nameMap = collectOccurences(values);
         renameDuplicates(values, nameMap);
     }
-    
-    private static void renameDuplicates(String[] names, Map nameMap)
+
+    private static void renameDuplicates(String[] names, Map<String, Integer> nameMap)
     {
         for (Object o : nameMap.keySet()) {
             String nextName = (String) o;
-            Integer nextValue = (Integer) nameMap.get(nextName);
+            Integer nextValue = nameMap.get(nextName);
             if (nextValue > 1) {
                 int number = 1;
                 for (int ii = 0; ii < names.length; ii++) {
@@ -444,11 +443,11 @@ public class ArrayUtil
         }
     }
 
-    private static Map collectOccurences(String[] names)
+    private static Map<String, Integer> collectOccurences(String[] names)
     {
-        Map nameMap = new HashMap();
+        Map<String, Integer> nameMap = new HashMap<>();
         for (String name : names) {
-            Integer currentValue = (Integer) nameMap.get(name);
+            Integer currentValue = nameMap.get(name);
             if (null == currentValue) {
                 nameMap.put(name, 1);
             } else {

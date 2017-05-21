@@ -11,7 +11,7 @@ public class CollectionUtilTest extends TestCase
 {
     public void testFillList()
     {
-        ArrayList testList = new ArrayList();
+        List<String> testList = new ArrayList<>();
         testList.add("1");
         testList.add("2");
         testList.add("3");
@@ -26,15 +26,15 @@ public class CollectionUtilTest extends TestCase
             assertNull(testList.get(ii));
         }
     }
-    
+
     public void testTruncateList()
     {
-        ArrayList list = new ArrayList();
+        List<String> list = new ArrayList<>();
         for(int ii = 0; ii < 100; ii++)
         {
             list.add("Test" + ii);
         }
-        List truncatedList = CollectionUtil.truncateList(list, 50);
+        List<String> truncatedList = CollectionUtil.truncateList(list, 50);
         assertTrue(truncatedList.size() == 50);
         for(int ii = 0; ii < 50; ii++)
         {

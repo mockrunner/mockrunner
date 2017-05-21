@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.oro.text.regex.MalformedPatternException;
 import org.apache.oro.text.regex.Pattern;
 import org.apache.oro.text.regex.Perl5Compiler;
@@ -30,7 +29,7 @@ public class StringUtil
     {
         return (null == string) || (0 >= string.length());
     }
-    
+
     /**
      * Returns <code>null</code>, if the specified string is <code>null</code> or
      * the empty string. Returns the specified string otherwise.
@@ -42,7 +41,7 @@ public class StringUtil
     {
         return isEmptyOrNull(string) ? null : string;
     }
-    
+
     /**
      * Replaces all occurrences of <code>match</code> in
      * <code>source</code> with <code>replacement</code>.
@@ -75,7 +74,7 @@ public class StringUtil
         buffer.append(source.substring(index));
         return buffer.toString();
     }
-    
+
     /**
      * Compares two strings and returns the last
      * index where the two string are equal. If
@@ -95,7 +94,7 @@ public class StringUtil
         }
         return endIndex - 1;
     }
-    
+
     /**
      * Converts the character at the specified index to
      * lowercase and returns the resulting string.
@@ -109,7 +108,7 @@ public class StringUtil
     {
         return lowerCase(string, index, -1);
     }
-    
+
     /**
      * Converts the character in the specified index range to
      * lowercase and returns the resulting string.
@@ -133,7 +132,7 @@ public class StringUtil
         }
         return buffer.toString();
     }
-    
+
     /**
      * Helper method for <code>toString()</code> implementations.
      * Returns a string <code>"field name: value"</code>. Handles
@@ -190,10 +189,11 @@ public class StringUtil
             }
         }
     }
-    
+
     private static void collectionToString(String fieldName, Object field, StringBuffer buffer)
     {
-        List list = new ArrayList((Collection)field);
+        @SuppressWarnings("unchecked")
+        List<Object> list = new ArrayList<>((Collection<Object>)field);
         if(0 >= list.size())
         {
             buffer.append(fieldName).append(": ").append("empty");
@@ -201,7 +201,7 @@ public class StringUtil
         else
         {
             for(int ii = 0; ii < list.size(); ii++)
-            { 
+            {
                 buffer.append(fieldToString(fieldName + " " + ii, list.get(ii)));
                 if(ii < list.size() - 1)
                 {
@@ -210,23 +210,25 @@ public class StringUtil
             }
         }
     }
-    
+
     private static void mapToString(String fieldName, Object field, StringBuffer buffer)
     {
-        if(0 >= ((Map)field).size())
+        @SuppressWarnings("unchecked")
+        Map<Object, Object> map = (Map<Object,Object>)field;
+        if(map.isEmpty())
         {
             buffer.append(fieldName).append(": ").append("empty");
         }
         else
         {
-            Iterator keys = ((Map)field).keySet().iterator();
+            Iterator<Object> keys = map.keySet().iterator();
             int ii = 0;
             while(keys.hasNext())
             {
                 Object key = keys.next();
-                Object value = ((Map)field).get(key);
+                Object value = map.get(key);
                 buffer.append(fieldToString(fieldName + " " + key, value));
-                if(ii < ((Map)field).size() - 1)
+                if(ii < map.size() - 1)
                 {
                     buffer.append("\n");
                 }
@@ -234,21 +236,21 @@ public class StringUtil
             }
         }
     }
-    
+
     /**
      * Appends the entries in the specified <code>List</code> as strings
      * with a terminating <i>"\n"</i> after each row.
      * @param buffer the buffer
      * @param data the <code>List</code> with the data
      */
-    public static void appendObjectsAsString(StringBuffer buffer, List data)
+    public static void appendObjectsAsString(StringBuffer buffer, List<? extends Object> data)
     {
         for (Object aData : data) {
             buffer.append(aData);
             buffer.append("\n");
         }
     }
-    
+
     /**
      * Appends <i>number</i> tabs (\t) to the buffer.
      * @param buffer the buffer
@@ -261,7 +263,7 @@ public class StringUtil
             buffer.append("\t");
         }
     }
-    
+
     /**
      * Splits a string into tokens. Similar to <code>StringTokenizer</code>
      * except that empty tokens are recognized and added as <code>null</code>.
@@ -276,7 +278,7 @@ public class StringUtil
     public static String[] split(String string, String delim, boolean doTrim)
     {
         int pos = 0, begin = 0;
-        ArrayList resultList = new ArrayList();
+        List<String> resultList = new ArrayList<>();
         while((-1 != (pos = string.indexOf(delim, begin))) && (begin < string.length()))
         {
             String token = string.substring(begin, pos);
@@ -291,10 +293,10 @@ public class StringUtil
             if(doTrim) token = token.trim();
             if(token.length() == 0) token = null;
             resultList.add(token);
-        }  
-        return (String[])resultList.toArray(new String[resultList.size()]);
+        }
+        return resultList.toArray(new String[resultList.size()]);
     }
-    
+
     /**
      * Returns how many times <code>string</code> contains
      * <code>other</code>.
@@ -302,7 +304,7 @@ public class StringUtil
      * @param other the string that is searched
      * @return the number of occurences
      */
-    public static int countMatches(String string, String other) 
+    public static int countMatches(String string, String other)
     {
         if(null == string) return 0;
         if(null == other) return 0;
@@ -318,7 +320,7 @@ public class StringUtil
         return count;
     }
 
-    
+
     /**
      * Returns if the specified strings are equal, ignoring
      * case, if <code>caseSensitive</code> is <code>false</code>.
@@ -337,9 +339,9 @@ public class StringUtil
         }
         return (source.equals(target));
     }
-    
+
     /**
-     * Returns if <code>source</code> contains <code>target</code>, 
+     * Returns if <code>source</code> contains <code>target</code>,
      * ignoring case, if <code>caseSensitive</code> is <code>false</code>.
      * @param source the source String
      * @param target the target String
@@ -356,10 +358,10 @@ public class StringUtil
         }
         return (source.contains(target));
     }
-    
+
     /**
-     * Returns if the regular expression <code>target</code> matches 
-     * <code>source</code>, ignoring case, if <code>caseSensitive</code> 
+     * Returns if the regular expression <code>target</code> matches
+     * <code>source</code>, ignoring case, if <code>caseSensitive</code>
      * is <code>false</code>.
      * @param source the source String
      * @param target the target String
@@ -378,7 +380,7 @@ public class StringUtil
         {
             Pattern pattern = new Perl5Compiler().compile(target, mask);
             return (new Perl5Matcher().matches(source, pattern));
-        } 
+        }
         catch(MalformedPatternException exc)
         {
             throw new NestedApplicationException(exc);

@@ -13,35 +13,35 @@ import com.mockrunner.gen.proc.JavaLineParser.Line;
 public class JavaLineProcessor
 {
     private JavaLineParser parser;
-    
+
     public JavaLineProcessor()
     {
         parser = new JavaLineParser();
     }
-    
+
     public void addLine(String line)
     {
         parser.addLine(line);
     }
-    
+
     public void addBlock(String block)
     {
         parser.addBlock(block);
     }
-    
-    public void addLines(List lines)
+
+    public void addLines(List<String> lines)
     {
         parser.addLines(lines);
     }
-    
-    public void addBlocks(List blocks)
+
+    public void addBlocks(List<String> blocks)
     {
         parser.addBlocks(blocks);
     }
-    
+
     public String process(String source)
     {
-        List result = parser.parse(source);
+        List<Line> result = parser.parse(source);
         LineNumberReader input = new LineNumberReader(new StringReader(source));
         StringWriter resultStringWriter = new StringWriter(source.length() + 100);
         PrintWriter output = new PrintWriter(resultStringWriter);
@@ -89,13 +89,13 @@ public class JavaLineProcessor
                     output.println(nextLine);
                 }
             }
-        } 
+        }
         catch(IOException exc)
         {
             throw new RuntimeException(exc.getMessage());
         }
     }
-    
+
     private void dumpToOutputUntil(LineNumberReader input, PrintWriter output, int processUntil)
     {
         while(input.getLineNumber() < processUntil - 1)
@@ -103,14 +103,14 @@ public class JavaLineProcessor
             try
             {
                 output.println(input.readLine());
-            } 
+            }
             catch(IOException exc)
             {
                 throw new RuntimeException(exc.getMessage());
             }
         }
     }
-    
+
     private void dumpToOutputUntilEnd(LineNumberReader input, PrintWriter output)
     {
         String line = null;
@@ -120,7 +120,7 @@ public class JavaLineProcessor
             {
                 output.println(line);
             }
-        } 
+        }
         catch (IOException exc)
         {
             throw new RuntimeException(exc.getMessage());

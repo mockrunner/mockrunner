@@ -15,11 +15,11 @@ public class CollectionUtil
      * @param list the <code>List</code> that should be filled
      * @param size the resulting size of the <code>List</code>
      */
-    public static void fillList(List list, int size)
+    public static <T> void fillList(List<T> list, int size)
     {
         fillList(list, size, null);
     }
-    
+
     /**
      * Fills a <code>List</code> with with the specified object
      * until it has the specified size. If the specified size is
@@ -35,7 +35,7 @@ public class CollectionUtil
             list.add(object);
         }
     }
-    
+
     /**
      * Returns a truncated version of the specified <code>List</code>.
      * @param list the <code>List</code>

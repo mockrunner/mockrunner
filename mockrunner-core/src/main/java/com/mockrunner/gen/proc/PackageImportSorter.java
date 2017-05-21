@@ -3,7 +3,6 @@ package com.mockrunner.gen.proc;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,7 +11,7 @@ import java.util.TreeSet;
 public class PackageImportSorter
 {
     private String[] order;
-    
+
     public PackageImportSorter()
     {
         order = new String[4];
@@ -21,12 +20,12 @@ public class PackageImportSorter
         order[2] = "org";
         order[3] = "com";
     }
-    
-    public List sortBlocks(List imports)
+
+    public List<Set<String>> sortBlocks(List<String> imports)
     {
-        Map groups = new HashMap();
-        Set sortedGroups = new TreeSet();
-        List resultList = new ArrayList();
+        Map<String,Group> groups = new HashMap<>();
+        Set<String> sortedGroups = new TreeSet<>();
+        List<Set<String>> resultList = new ArrayList<>();
         initializeGroups(imports, groups, sortedGroups);
         if(groups.isEmpty())
         {
@@ -37,26 +36,26 @@ public class PackageImportSorter
         prepareResultList(groups, resultList);
         return resultList;
     }
-    
-    private void prepareSingleBlock(List imports, List resultList)
+
+    private void prepareSingleBlock(List<String> imports, List<Set<String>> resultList)
     {
-        Set block = new TreeSet(imports);
+        Set<String> block = new TreeSet<String>(imports);
         resultList.add(block);
     }
 
-    private List getGroupsAsSortedList()
+    private List<String> getGroupsAsSortedList()
     {
-        Set allGroupSet = new TreeSet();
+        Set<String> allGroupSet = new TreeSet<>();
         Collections.addAll(allGroupSet, order);
-        List allGroups = new ArrayList(allGroupSet);
+        List<String> allGroups = new ArrayList<>(allGroupSet);
         Collections.reverse(allGroups);
         return allGroups;
     }
-    
-    private void prepareResultList(Map groups, List resultList)
+
+    private void prepareResultList(Map<String,Group> groups, List<Set<String>> resultList)
     {
         for (String anOrder : order) {
-            Group currentGroup = (Group) groups.get(anOrder);
+            Group currentGroup = groups.get(anOrder);
             if (null != currentGroup) {
                 addIfNotEmpty(resultList, currentGroup.getBeforeGroup());
                 addIfNotEmpty(resultList, currentGroup.getActualGroup());
@@ -65,15 +64,15 @@ public class PackageImportSorter
         }
     }
 
-    private void addIfNotEmpty(List list, Set set)
+    private void addIfNotEmpty(List<Set<String>> list, Set<String> set)
     {
         if(null == set || set.isEmpty()) return;
         list.add(set);
     }
-    
-    private void initializeGroups(List imports, Map groups, Set sortedGroups)
-    {   
-        List allGroups = getGroupsAsSortedList();
+
+    private void initializeGroups(List<String> imports, Map<String, Group> groups, Set<String> sortedGroups)
+    {
+        List<String> allGroups = getGroupsAsSortedList();
         sortedGroups.addAll(imports);
         for (Object anImport : imports) {
             String currentImport = (String) anImport;
@@ -82,10 +81,9 @@ public class PackageImportSorter
         sortedGroups.addAll(groups.keySet());
     }
 
-    private void createGroupIfMatching(List allGroups, Map groups, Set sortedGroups, String currentImport)
+    private void createGroupIfMatching(List<String> allGroups, Map<String, Group> groups, Set<String> sortedGroups, String currentImport)
     {
-        for (Object allGroup : allGroups) {
-            String groupName = (String) allGroup;
+        for (String groupName : allGroups) {
             if (currentImport.startsWith(groupName)) {
                 Group group = getGroupByName(groups, groupName);
                 group.addToActualGroup(currentImport);
@@ -95,10 +93,10 @@ public class PackageImportSorter
         }
     }
 
-    private Group getGroupByName(Map groups, String groupName)
+    private Group getGroupByName(Map<String, Group> groups, String groupName)
     {
-        Group group = (Group)groups.get(groupName);
-        if(null == group)    
+        Group group = groups.get(groupName);
+        if(null == group)
         {
             group = new Group(groupName);
             groups.put(groupName, group);
@@ -106,18 +104,17 @@ public class PackageImportSorter
         return group;
     }
 
-    private void classifyImports(Map groups, Set sortedGroups)
+    private void classifyImports(Map<String,Group> groups, Set<String> sortedGroups)
     {
         Group currentGroup = null;
-        Set tempBeforeGroup = new TreeSet();
-        for (Object sortedGroup : sortedGroups) {
-            String currentImport = (String) sortedGroup;
-            Group tempGroup = (Group) groups.get(currentImport);
+        Set<String> tempBeforeGroup = new TreeSet<>();
+        for (String currentImport : sortedGroups) {
+            Group tempGroup = groups.get(currentImport);
             currentGroup = handleTempGroup(currentGroup, tempBeforeGroup, currentImport, tempGroup);
         }
     }
-    
-    private Group handleTempGroup(Group currentGroup, Set tempBeforeGroup, String currentImport, Group tempGroup)
+
+    private Group handleTempGroup(Group currentGroup, Set<String> tempBeforeGroup, String currentImport, Group tempGroup)
     {
         if(null != tempGroup)
         {
@@ -144,63 +141,63 @@ public class PackageImportSorter
     private class Group
     {
         private String groupName;
-        private Set beforeGroup;
-        private Set actualGroup;
-        private Set afterGroup;
-        
+        private Set<String> beforeGroup;
+        private Set<String> actualGroup;
+        private Set<String> afterGroup;
+
         public Group(String groupName)
         {
             this.groupName = groupName;
-            beforeGroup = new TreeSet();
-            actualGroup = new TreeSet();
-            afterGroup = new TreeSet();
+            beforeGroup = new TreeSet<>();
+            actualGroup = new TreeSet<>();
+            afterGroup = new TreeSet<>();
         }
-        
+
         public String getGroupName()
         {
             return groupName;
         }
-        
-        public Set getActualGroup()
+
+        public Set<String> getActualGroup()
         {
             return actualGroup;
         }
-        
-        public Set getAfterGroup()
+
+        public Set<String> getAfterGroup()
         {
             return afterGroup;
         }
-        
-        public Set getBeforeGroup()
+
+        public Set<String> getBeforeGroup()
         {
             return beforeGroup;
         }
-        
-        public void addAllToBeforeGroup(Set importSet)
+
+        public void addAllToBeforeGroup(Set<String> importSet)
         {
             beforeGroup.addAll(importSet);
         }
-        
-        public void addAllToActualGroup(Set importSet)
+
+        public void addAllToActualGroup(Set<String> importSet)
         {
             actualGroup.addAll(importSet);
         }
-        
-        public void addAllToAfterGroup(Set importSet)
+
+        public void addAllToAfterGroup(Set<String> importSet)
         {
             afterGroup.addAll(importSet);
         }
-        
+
         public void addToBeforeGroup(String importString)
         {
             beforeGroup.add(importString);
         }
-        
+
         public void addToActualGroup(String importString)
         {
             actualGroup.add(importString);
         }
-        
+
         public void addToAfterGroup(String importString)
         {
             afterGroup.add(importString);

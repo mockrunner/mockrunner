@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface AdapterProcessor
 {
-    void process(Class module, List excludedMethods);
+    void process(Class<?> module, List<String> excludedMethods);
     String getName();
     String getOutput();
 }

@@ -12,91 +12,91 @@ import com.mockrunner.util.common.StringUtil;
 public class JavaClassGenerator
 {
     private Package packageInfo;
-    private List imports;
+    private List<String> imports;
     private String className;
     private boolean isAbstract;
-    private Class superClass;
-    private List interfaces;
-    private List memberTypes;
-    private List memberNames;
+    private Class<?> superClass;
+    private List<Class<?>> interfaces;
+    private List<Class<?>> memberTypes;
+    private List<String> memberNames;
     private String[] classCommentLines;
     private boolean createJavaDocComments;
-    private List methods;
-    private List constructors;
-    
+    private List<MethodDeclaration> methods;
+    private List<ConstructorDeclaration> constructors;
+
     public JavaClassGenerator()
     {
         reset();
     }
-    
+
     public void reset()
     {
-        imports = new ArrayList();
-        interfaces = new ArrayList();
-        memberTypes = new ArrayList();
-        memberNames = new ArrayList();
+        imports = new ArrayList<>();
+        interfaces = new ArrayList<>();
+        memberTypes = new ArrayList<>();
+        memberNames = new ArrayList<>();
         createJavaDocComments = true;
         isAbstract = false;
-        methods = new ArrayList();
-        constructors = new ArrayList();
+        methods = new ArrayList<>();
+        constructors = new ArrayList<>();
     }
 
     public void setCreateJavaDocComments(boolean createJavaDocComments)
     {
         this.createJavaDocComments = createJavaDocComments;
     }
-    
+
     public void setPackage(Package packageInfo)
     {
         this.packageInfo = packageInfo;
     }
-    
+
     public void setClassName(String className)
     {
         this.className = className;
     }
-    
+
     public void setAbstract(boolean isAbstract)
     {
         this.isAbstract = isAbstract;
     }
-    
-    public void setSuperClass(Class superClass)
+
+    public void setSuperClass(Class<?> superClass)
     {
         this.superClass = superClass;
     }
-    
-    public void addImport(Class importClass)
+
+    public void addImport(Class<?> importClass)
     {
         imports.add(importClass.getName());
     }
-    
-    public void addInterfaceImplementation(Class interfaceClass)
+
+    public void addInterfaceImplementation(Class<?> interfaceClass)
     {
         interfaces.add(interfaceClass);
     }
-    
+
     public void setClassComment(String[] commentLines)
     {
         classCommentLines = (String[])ArrayUtil.copyArray(commentLines);
     }
-    
-    public void addMemberDeclaration(Class memberType, String name)
+
+    public void addMemberDeclaration(Class<?> memberType, String name)
     {
         memberTypes.add(memberType);
         memberNames.add(name);
     }
-    
+
     public void addConstructorDeclaration()
     {
         constructors.add(new ConstructorDeclaration());
     }
-    
+
     public void addConstructorDeclaration(ConstructorDeclaration constructor)
     {
         constructors.add(constructor);
     }
-    
+
     public void addMethodDeclaration(MethodDeclaration method)
     {
         methods.add(method);
@@ -126,7 +126,7 @@ public class JavaClassGenerator
         assembler.appendRightBrace();
         return assembler.getResult();
     }
-    
+
     private String getPackageName()
     {
         if(null != packageInfo)
@@ -135,39 +135,38 @@ public class JavaClassGenerator
         }
         return null;
     }
-    
-    private String getClassName(Class clazz)
+
+    private String getClassName(Class<?> clazz)
     {
         if(null == clazz) return null;
         return ClassUtil.getClassName(clazz);
     }
-    
-    private String[] getClassNames(List classList)
+
+    private String[] getClassNames(List<Class<?>> classList)
     {
         if(null == classList || classList.size() <= 0) return null;
-        List nameList = new ArrayList();
-        for (Object aClassList : classList) {
-            Class clazz = (Class) aClassList;
+        List<String> nameList = new ArrayList<>();
+        for (Class<?> clazz : classList) {
             if (null != clazz) {
                 nameList.add(getClassName(clazz));
             }
         }
-        return (String[])nameList.toArray(new String[nameList.size()]);
+        return nameList.toArray(new String[nameList.size()]);
     }
-    
-    private String[] getClassNames(Class[] arguments)
+
+    private String[] getClassNames(Class<?>[] arguments)
     {
         if(null == arguments || arguments.length <= 0) return null;
         String[] names = new String[arguments.length];
         for(int ii = 0; ii < arguments.length; ii++)
         {
-            Class clazz = arguments[ii];
+            Class<?> clazz = arguments[ii];
             names[ii] = getClassName(clazz);
         }
         return names;
     }
-    
-    private String[] getArgumentNames(Class[] arguments, String[] argumentNames)
+
+    private String[] getArgumentNames(Class<?>[] arguments, String[] argumentNames)
     {
         if(null == arguments || arguments.length <= 0) return null;
         if(null != argumentNames && argumentNames.length >= arguments.length) return argumentNames;
@@ -184,14 +183,13 @@ public class JavaClassGenerator
 
     private void appendImportBlocks(JavaLineAssembler assembler)
     {
-        List importBlocks = processImports();
-        for (Object importBlock : importBlocks) {
-            Set currentBlock = (Set) importBlock;
-            assembler.appendImports(new ArrayList(currentBlock));
+        List<Set<String>> importBlocks = processImports();
+        for (Set<String> currentBlock : importBlocks) {
+            assembler.appendImports(new ArrayList<>(currentBlock));
             assembler.appendNewLine();
         }
     }
-    
+
     private void appendCommentBlock(JavaLineAssembler assembler, String[] commentLines)
     {
         if(createJavaDocComments)
@@ -210,10 +208,10 @@ public class JavaClassGenerator
         if(null == memberTypeNames) return;
         for(int ii = 0; ii < memberTypeNames.length; ii++)
         {
-            assembler.appendMemberDeclaration(memberTypeNames[ii], (String)memberNames.get(ii));
+            assembler.appendMemberDeclaration(memberTypeNames[ii], memberNames.get(ii));
         }
     }
-    
+
     private void appendMethods(JavaLineAssembler assembler)
     {
         for (Object method : methods) {
@@ -229,7 +227,7 @@ public class JavaClassGenerator
             appendMethodBody(assembler, declaration);
         }
     }
-    
+
     private void appendConstructors(JavaLineAssembler assembler)
     {
         for (Object constructor : constructors) {
@@ -242,7 +240,7 @@ public class JavaClassGenerator
             appendMethodBody(assembler, declaration);
         }
     }
-    
+
     private void appendMethodHeader(JavaLineAssembler assembler, ConstructorDeclaration declaration)
     {
         assembler.appendNewLine();
@@ -266,21 +264,21 @@ public class JavaClassGenerator
         assembler.appendCodeLines(codeLines);
         assembler.setIndentLevel(1);
     }
-    
+
     private String[] prepareModifiers(int modifier)
     {
         String modifierString = Modifier.toString(modifier);
         if(null == modifierString || modifierString.trim().length() <= 0) return null;
         return StringUtil.split(modifierString, " ", true);
     }
-    
-    private List processImports()
+
+    private List<Set<String>> processImports()
     {
         addMissingImports();
         PackageImportSorter sorter = new PackageImportSorter();
         return sorter.sortBlocks(imports);
     }
-    
+
     private void addMissingImports()
     {
         addImportIfNecessary(superClass);
@@ -298,41 +296,41 @@ public class JavaClassGenerator
             addImportsForExceptions(declaration);
         }
     }
-    
+
     private void addImportsForExceptions(ConstructorDeclaration declaration)
     {
-        Class[] exceptions = declaration.getExceptions();
+        Class<?>[] exceptions = declaration.getExceptions();
         if(null == exceptions || exceptions.length <= 0) return;
-        for (Class exception : exceptions) {
+        for (Class<?> exception : exceptions) {
             addImportIfNecessary(exception);
         }
     }
 
     private void addImportsForArguments(ConstructorDeclaration declaration)
     {
-        Class[] arguments = declaration.getArguments();
+        Class<?>[] arguments = declaration.getArguments();
         if(null == arguments || arguments.length <= 0) return;
-        for (Class argument : arguments) {
+        for (Class<?> argument : arguments) {
             addImportIfNecessary(argument);
         }
     }
-    
+
     private void addImportForReturnType(MethodDeclaration declaration)
     {
-        Class returnType = declaration.getReturnType();
+        Class<?> returnType = declaration.getReturnType();
         if(null == returnType) return;
         addImportIfNecessary(returnType);
     }
-    
-    private void addImportsIfNecessary(List classes)
+
+    private void addImportsIfNecessary(List<Class<?>> classes)
     {
         if(null == classes) return;
         for (Object aClass : classes) {
-            addImportIfNecessary((Class) aClass);
+            addImportIfNecessary((Class<?>) aClass);
         }
     }
 
-    private void addImportIfNecessary(Class clazz)
+    private void addImportIfNecessary(Class<?> clazz)
     {
         if(null == clazz) return;
         while(clazz.isArray()) clazz = clazz.getComponentType();
@@ -342,8 +340,8 @@ public class JavaClassGenerator
         if(clazz.isPrimitive()) return;
         addImport(clazz);
     }
-    
-    private boolean belongsToSamePackage(Class clazz)
+
+    private boolean belongsToSamePackage(Class<?> clazz)
     {
         String thisPackageName = getPackageName();
         Package classPackage = clazz.getPackage();
@@ -362,93 +360,93 @@ public class JavaClassGenerator
         }
         return thisPackageName.equals(classPackageName);
     }
-    
+
     public static class ConstructorDeclaration
     {
-        private Class[] arguments;
+        private Class<?>[] arguments;
         private String[] argumentNames;
         private String[] codeLines;
         private String[] commentLines;
-        private Class[] exceptions;
+        private Class<?>[] exceptions;
 
         public String[] getCodeLines()
         {
             if(null == codeLines) return null;
             return (String[])ArrayUtil.copyArray(codeLines);
         }
-        
+
         public void setCodeLines(String[] codeLines)
         {
             this.codeLines = (String[])ArrayUtil.copyArray(codeLines);
         }
-        
+
         public String[] getCommentLines()
         {
             if(null == commentLines) return null;
             return (String[])ArrayUtil.copyArray(commentLines);
         }
-        
+
         public void setCommentLines(String[] commentLines)
         {
             this.commentLines = (String[])ArrayUtil.copyArray(commentLines);
         }
-       
+
         public String[] getArgumentNames()
         {
             if(null == argumentNames) return null;
             return (String[])ArrayUtil.copyArray(argumentNames);
         }
-        
+
         public void setArgumentNames(String[] argumentNames)
         {
             this.argumentNames = (String[])ArrayUtil.copyArray(argumentNames);
         }
-        
-        public Class[] getArguments()
+
+        public Class<?>[] getArguments()
         {
             if(null == arguments) return null;
             return (Class[])ArrayUtil.copyArray(arguments);
         }
-        
-        public void setArguments(Class[] arguments)
+
+        public void setArguments(Class<?>[] arguments)
         {
             this.arguments = (Class[])ArrayUtil.copyArray(arguments);
         }
-        
-        public Class[] getExceptions()
+
+        public Class<?>[] getExceptions()
         {
             if(null == exceptions) return null;
             return (Class[])ArrayUtil.copyArray(exceptions);
         }
-        
-        public void setExceptions(Class[] exceptions)
+
+        public void setExceptions(Class<?>[] exceptions)
         {
             this.exceptions = (Class[])ArrayUtil.copyArray(exceptions);
         }
     }
-    
+
     public static class MethodDeclaration extends ConstructorDeclaration
     {
         private int modifier;
-        private Class returnType;
+        private Class<?> returnType;
         private String name;
-  
+
         public MethodDeclaration()
         {
             this("method");
         }
-        
+
         public MethodDeclaration(String name)
         {
             this(Modifier.PUBLIC, name);
         }
-        
+
         public MethodDeclaration(int modifier, String name)
         {
             this(modifier, name, Void.TYPE);
         }
-        
-        public MethodDeclaration(int modifier, String name, Class returnType)
+
+        public MethodDeclaration(int modifier, String name, Class<?> returnType)
         {
             setModifier(modifier);
             setReturnType(returnType);
@@ -459,28 +457,28 @@ public class JavaClassGenerator
         {
             return modifier;
         }
-        
+
         public void setModifier(int modifier)
         {
             this.modifier = modifier;
         }
-        
+
         public String getName()
         {
             return name;
         }
-        
+
         public void setName(String name)
         {
             this.name = name;
         }
-        
-        public Class getReturnType()
+
+        public Class<?> getReturnType()
         {
             return returnType;
         }
-        
-        public void setReturnType(Class returnType)
+
+        public void setReturnType(Class<?> returnType)
         {
             this.returnType = returnType;
         }

@@ -20,7 +20,7 @@ public class StringUtilTest extends TestCase
         assertFalse(StringUtil.isEmptyOrNull(" "));
         assertFalse(StringUtil.isEmptyOrNull("abc"));
     }
-    
+
     public void testEmptyStringToNull()
     {
         assertNull(StringUtil.emptyStringToNull(null));
@@ -29,14 +29,14 @@ public class StringUtilTest extends TestCase
         assertEquals(" ", StringUtil.emptyStringToNull(" "));
         assertEquals("abc", StringUtil.emptyStringToNull("abc"));
     }
-    
+
     public void testReplaceAll()
     {
         try
         {
             StringUtil.replaceAll(null, "test", "test");
             fail();
-        } 
+        }
         catch(IllegalArgumentException exc)
         {
             //should throw exception
@@ -45,7 +45,7 @@ public class StringUtilTest extends TestCase
         {
             StringUtil.replaceAll("test", null, "test");
             fail();
-        } 
+        }
         catch(IllegalArgumentException exc)
         {
             //should throw exception
@@ -54,7 +54,7 @@ public class StringUtilTest extends TestCase
         {
             StringUtil.replaceAll("test", "test", null);
             fail();
-        } 
+        }
         catch(IllegalArgumentException exc)
         {
             //should throw exception
@@ -63,7 +63,7 @@ public class StringUtilTest extends TestCase
         {
             StringUtil.replaceAll("test", "", "test");
             fail();
-        } 
+        }
         catch(IllegalArgumentException exc)
         {
             //should throw exception
@@ -89,7 +89,7 @@ public class StringUtilTest extends TestCase
         assertEquals("Hello world ", StringUtil.replaceAll("   ", "  ", "Hello world"));
         assertEquals("aabc", StringUtil.replaceAll("abcdabc", "abcd", "a"));
     }
-    
+
     public void testCompare()
     {
         assertEquals(-1, StringUtil.compare("", ""));
@@ -105,7 +105,7 @@ public class StringUtilTest extends TestCase
         assertEquals(2, StringUtil.compare("1234", "123"));
         assertEquals(11, StringUtil.compare(" Hello World", " Hello World "));
     }
-    
+
     public void testLowerCase()
     {
         assertEquals("aBC", StringUtil.lowerCase("ABC", 0));
@@ -115,13 +115,13 @@ public class StringUtilTest extends TestCase
         {
             StringUtil.lowerCase("abc", 3);
             fail();
-        } 
+        }
         catch(IndexOutOfBoundsException exc)
         {
             //should throw exception
         }
     }
-    
+
     public void testLowerCaseWithEndIndex()
     {
         assertEquals("abC", StringUtil.lowerCase("ABC", 0, 2));
@@ -134,13 +134,13 @@ public class StringUtilTest extends TestCase
         {
             StringUtil.lowerCase("abc", 0, 4);
             fail();
-        } 
+        }
         catch(IndexOutOfBoundsException exc)
         {
             //should throw exception
         }
     }
-    
+
     public void testSplit()
     {
         String test = "This;;is;a;;  ;test; String;;";
@@ -160,10 +160,10 @@ public class StringUtilTest extends TestCase
         assertEquals("This;;is;a;;  ;", tokens[0]);
         assertEquals("; String;;", tokens[1]);
     }
-    
+
     public void testAppendObjectsAsString()
     {
-        List list = new ArrayList();
+        List<Object> list = new ArrayList<>();
         list.add("Test");
         list.add("Test");
         list.add(1000);
@@ -173,7 +173,7 @@ public class StringUtilTest extends TestCase
         StringUtil.appendObjectsAsString(buffer, list);
         assertEquals("Test\nTest\n1000\nnull\n3\n", buffer.toString());
     }
-    
+
     public void testCountMatches()
     {
         assertEquals(0, StringUtil.countMatches(null, null));
@@ -192,7 +192,7 @@ public class StringUtilTest extends TestCase
         assertEquals(1, StringUtil.countMatches("bbb", "bb"));
         assertEquals(0, StringUtil.countMatches("bbb", "bbbb"));
     }
-    
+
     public void testMatchesExact()
     {
         assertTrue(StringUtil.matchesExact("", "", true));
@@ -204,7 +204,7 @@ public class StringUtilTest extends TestCase
         assertFalse(StringUtil.matchesExact("abc", "abcd", true));
         assertFalse(StringUtil.matchesExact("abcd", "abc", false));
     }
-    
+
     public void testMatchesContains()
     {
         assertTrue(StringUtil.matchesContains("", "", true));
@@ -217,7 +217,7 @@ public class StringUtilTest extends TestCase
         assertFalse(StringUtil.matchesContains("", "abc", true));
         assertFalse(StringUtil.matchesContains("abc", "abcd", true));
     }
-    
+
     public void testMatchesPerl5()
     {
         assertTrue(StringUtil.matchesPerl5("abc", "abc", true));
@@ -228,24 +228,24 @@ public class StringUtilTest extends TestCase
         assertFalse(StringUtil.matchesPerl5("aBc", "a[abc]c", true));
         assertFalse(StringUtil.matchesPerl5("a[abc]c", "abc", true));
     }
-    
+
     public void testFieldToString()
-    { 
+    {
         assertEquals("test: class java.lang.String", StringUtil.fieldToString("test", String.class));
         assertEquals("test: 3", StringUtil.fieldToString("test", 3));
-        assertEquals("test: empty", StringUtil.fieldToString("test", new ArrayList()));
+        assertEquals("test: empty", StringUtil.fieldToString("test", new ArrayList<>()));
         assertEquals("test: empty", StringUtil.fieldToString("test", new Object[0]));
-        List testList = new ArrayList();
+        List<Object> testList = new ArrayList<>();
         testList.add(5);
         testList.add("abc");
         testList.add(this.getClass());
         assertEquals("test 0: 5\ntest 1: abc\ntest 2: class com.mockrunner.test.util.StringUtilTest", StringUtil.fieldToString("test", testList));
         assertEquals("test 0: 5\ntest 1: abc\ntest 2: class com.mockrunner.test.util.StringUtilTest", StringUtil.fieldToString("test", testList.toArray()));
-        Map testMap = new TreeMap();
+        Map<String,String> testMap = new TreeMap<>();
         testMap.put("5", "xyz");
         testMap.put("abc", "xyz");
         testMap.put("123", null);
         assertEquals("test 123: null\ntest 5: xyz\ntest abc: xyz", StringUtil.fieldToString("test", testMap));
-        assertEquals("test: empty", StringUtil.fieldToString("test", new HashMap()));
+        assertEquals("test: empty", StringUtil.fieldToString("test", new HashMap<>()));
     }
 }

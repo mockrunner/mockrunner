@@ -22,7 +22,7 @@ public class ClassUtil
         "synchronized", "this", "throw", "throws", "transient",
         "try", "void", "volatile", "while"
     };
-    
+
     /**
      * Returns the name of the package of the specified class.
      * If the class has no package, an empty String will be
@@ -30,13 +30,13 @@ public class ClassUtil
      * @param clazz the Class
      * @return the package name
      */
-    public static String getPackageName(Class clazz)
+    public static String getPackageName(Class<?> clazz)
     {
         Package classPackage = clazz.getPackage();
         if(null == classPackage) return "";
         return classPackage.getName();
     }
-    
+
     /**
      * Returns the name of the specified class. This method
      * only returns the class name without package information.
@@ -47,7 +47,7 @@ public class ClassUtil
      * @param clazz the Class
      * @return the class name
      */
-    public static String getClassName(Class clazz)
+    public static String getClassName(Class<?> clazz)
     {
         String dimensions = "";
         while(clazz.isArray())
@@ -65,7 +65,7 @@ public class ClassUtil
             return clazz.getName().substring(classPackage.length() + 1) + dimensions;
         }
     }
-    
+
     /**
      * Returns all interfaces implemented by the specified class
      * including all interfaces implemented by super classes.
@@ -75,17 +75,17 @@ public class ClassUtil
      * @param clazz the Class
      * @return all interfaces implemented by the specified class
      */
-    public static Class[] getImplementedInterfaces(Class clazz)
+    public static Class<?>[] getImplementedInterfaces(Class<?> clazz)
     {
         if(clazz.isInterface()) return new Class[0];
-        Class[] classes = getInheritanceHierarchy(clazz);
-        Set interfaceSet = new HashSet();
-        for (Class aClass : classes) {
+        Class<?>[] classes = getInheritanceHierarchy(clazz);
+        Set<Class<?>> interfaceSet = new HashSet<>();
+        for (Class<?> aClass : classes) {
             interfaceSet.addAll(Arrays.asList(aClass.getInterfaces()));
         }
-        return (Class[])interfaceSet.toArray(new Class[interfaceSet.size()]);
+        return interfaceSet.toArray(new Class[interfaceSet.size()]);
     }
-    
+
     /**
      * Returns the inheritance hierarchy of the specified class.
      * The returned array includes all superclasses of the specified class
@@ -96,19 +96,19 @@ public class ClassUtil
      * @param clazz the Class
      * @return all superclasses, most general superclass first
      */
-    public static Class[] getInheritanceHierarchy(Class clazz)
+    public static Class<?>[] getInheritanceHierarchy(Class<?> clazz)
     {
-        List classes = new ArrayList();
-        Class currentClass = clazz;
+        List<Class<?>> classes = new ArrayList<>();
+        Class<?> currentClass = clazz;
         while(null != currentClass)
         {
             classes.add(currentClass);
             currentClass = currentClass.getSuperclass();
         }
         Collections.reverse(classes);
-        return (Class[])classes.toArray(new Class[classes.size()]);
+        return classes.toArray(new Class[classes.size()]);
     }
-    
+
     /**
      * Returns if the specified string is a Java language
      * keyword.
@@ -123,7 +123,7 @@ public class ClassUtil
         }
         return false;
     }
-    
+
     /**
      * Returns a suitable argument name for arguments
      * of type <code>argumentType</code>. Simply takes
@@ -133,13 +133,13 @@ public class ClassUtil
      * <code>jmsTestModule</code>.
      * If the specified <code>argumentType</code> is an array,
      * an <code>"s"</code> is appended to the string.
-     * If the resulting string is a Java keyword, <code>"Value"</code> 
+     * If the resulting string is a Java keyword, <code>"Value"</code>
      * is appended to the string (which is always the case with
      * primitive types).
      * @param argumentType the argument type
      * @return a suitable mixed case argument name
      */
-    public static String getArgumentName(Class argumentType)
+    public static String getArgumentName(Class<?> argumentType)
     {
         String dimensions = "";
         while(argumentType.isArray())

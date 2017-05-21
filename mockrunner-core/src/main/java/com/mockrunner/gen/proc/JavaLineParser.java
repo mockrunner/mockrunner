@@ -8,40 +8,40 @@ import java.util.List;
 
 public class JavaLineParser
 {
-    private List linesToParse;
-    private List blocksToParse;
-    
+    private List<String> linesToParse;
+    private List<String> blocksToParse;
+
     public JavaLineParser()
     {
-        linesToParse = new ArrayList();
-        blocksToParse = new ArrayList();
+        linesToParse = new ArrayList<>();
+        blocksToParse = new ArrayList<>();
     }
-    
+
     public void addLine(String line)
     {
         linesToParse.add(line);
     }
-    
-    public void addLines(List lines)
+
+    public void addLines(List<String> lines)
     {
         linesToParse.addAll(lines);
     }
-    
+
     public void addBlock(String blockLine)
     {
         blocksToParse.add(blockLine);
     }
-    
-    public void addBlocks(List blocks)
+
+    public void addBlocks(List<String> blocks)
     {
         blocksToParse.addAll(blocks);
     }
-    
-    public List parse(String source)
+
+    public List<Line> parse(String source)
     {
-        List resultList = new ArrayList();
-        List tempLinesToParse = new ArrayList(linesToParse);
-        List tempBlocksToParse = new ArrayList(blocksToParse);
+        List<Line> resultList = new ArrayList<>();
+        List<String> tempLinesToParse = new ArrayList<>(linesToParse);
+        List<String> tempBlocksToParse = new ArrayList<>(blocksToParse);
         LineNumberReader input = new LineNumberReader(new StringReader(source));
         String currentLine = null;
         try
@@ -77,8 +77,8 @@ public class JavaLineParser
         checkLinesOrBlocksLeft(tempLinesToParse, tempBlocksToParse);
         return resultList;
     }
-    
-    private void checkLinesOrBlocksLeft(List tempLinesToParse, List tempBlocksToParse)
+
+    private void checkLinesOrBlocksLeft(List<String> tempLinesToParse, List<String> tempBlocksToParse)
     {
         StringBuilder message = new StringBuilder("");
         if(tempLinesToParse.size() > 0)
@@ -100,8 +100,8 @@ public class JavaLineParser
             throw new RuntimeException(message.toString());
         }
     }
-    
-    private String checkLine(String currentLine, List linesToParse)
+
+    private String checkLine(String currentLine, List<String> linesToParse)
     {
         for (Object aLinesToParse : linesToParse) {
             String nextLine = (String) aLinesToParse;
@@ -111,8 +111,8 @@ public class JavaLineParser
         }
         return null;
     }
-    
-    private String checkBlock(String currentLine, List blocksToParse)
+
+    private String checkBlock(String currentLine, List<String> blocksToParse)
     {
         for (Object aBlocksToParse : blocksToParse) {
             String nextLine = (String) aBlocksToParse;
@@ -122,7 +122,7 @@ public class JavaLineParser
         }
         return null;
     }
-    
+
     private int determineEndLineNumber(LineNumberReader input)
     {
         String currentLine = null;
@@ -149,45 +149,45 @@ public class JavaLineParser
             {
                 return -1;
             }
-        } 
+        }
         catch(IOException exc)
         {
             throw new RuntimeException(exc.getMessage());
         }
     }
-    
+
     public static class Line
     {
         private String line;
         private int lineNumber;
-        
+
         public Line(String line, int lineNumber)
         {
             this.line = line;
             this.lineNumber = lineNumber;
         }
-        
+
         public String getLine()
         {
             return line;
         }
-        
+
         public int getLineNumber()
         {
             return lineNumber;
         }
     }
-    
+
     public static class Block extends Line
     {
         private int endLineNumber;
-        
+
         public Block(String line, int lineNumber, int endLineNumber)
         {
             super(line, lineNumber);
             this.endLineNumber = endLineNumber;
         }
-        
+
         public int getEndLineNumber()
         {
             return endLineNumber;

@@ -13,18 +13,18 @@ public class ArrayUtilTest extends TestCase
     public void testGetListFromByteArray()
     {
         byte[] testArray = new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8};
-        List list = ArrayUtil.getListFromByteArray(testArray);
+        List<Byte> list = ArrayUtil.getListFromByteArray(testArray);
         assertTrue(list.size() == 9);
         for(int ii = 0; ii < testArray.length; ii++)
         {
-            byte nextByteFromList = (Byte) list.get(ii);
+            byte nextByteFromList = list.get(ii);
             assertEquals(testArray[ii], nextByteFromList);
         }
     }
 
     public void testGetByteArrayFromList()
     {
-        ArrayList list = new ArrayList();
+        List<Byte> list = new ArrayList<>();
         for(int ii = 0; ii < 9; ii++)
         {
             list.add((byte) ii);
@@ -58,38 +58,38 @@ public class ArrayUtilTest extends TestCase
         data = ArrayUtil.getByteArrayFromList(list, 0, 1);
         assertTrue(data.length == 1);
         assertEquals(0, data[0]);
-        data = ArrayUtil.getByteArrayFromList(new ArrayList(), 0, 0);
+        data = ArrayUtil.getByteArrayFromList(new ArrayList<>(), 0, 0);
         assertNotNull(data);
         assertTrue(data.length == 0);
     }
-    
+
     public void testAddBytesToArrayList()
     {
-        ArrayList list = new ArrayList();
+        List<Byte> list = new ArrayList<>();
         byte[] testArray = new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8};
         ArrayUtil.addBytesToList(testArray, list, 0);
         assertTrue(list.size() == 9);
         for(int ii = 0; ii < testArray.length; ii++)
         {
-            byte nextByteFromList = (Byte) list.get(ii);
+            byte nextByteFromList = list.get(ii);
             assertEquals(testArray[ii], nextByteFromList);
         }
         ArrayUtil.addBytesToList(testArray, 1, 3, list, 9);
         assertTrue(list.size() == 12);
         for(int ii = 0; ii < testArray.length; ii++)
         {
-            byte nextByteFromList = (Byte) list.get(ii);
+            byte nextByteFromList = list.get(ii);
             assertEquals(testArray[ii], nextByteFromList);
         }
-        assertEquals(1, ((Byte)list.get(9)).byteValue());
-        assertEquals(2, ((Byte)list.get(10)).byteValue());
-        assertEquals(3, ((Byte)list.get(11)).byteValue());
+        assertEquals(1, list.get(9).byteValue());
+        assertEquals(2, list.get(10).byteValue());
+        assertEquals(3, list.get(11).byteValue());
         ArrayUtil.addBytesToList(testArray, 1, 3, list, 0);
         assertTrue(list.size() == 12);
-        assertEquals(1, ((Byte)list.get(0)).byteValue());
-        assertEquals(2, ((Byte)list.get(1)).byteValue());
-        assertEquals(3, ((Byte)list.get(2)).byteValue());
-        assertEquals(3, ((Byte)list.get(3)).byteValue());
+        assertEquals(1, list.get(0).byteValue());
+        assertEquals(2, list.get(1).byteValue());
+        assertEquals(3, list.get(2).byteValue());
+        assertEquals(3, list.get(3).byteValue());
         ArrayUtil.addBytesToList(testArray, list, 100);
         assertTrue(list.size() == 109);
         for(int ii = 12; ii < 100; ii++)
@@ -98,7 +98,7 @@ public class ArrayUtilTest extends TestCase
         }
         for(int ii = 100; ii < 109; ii++)
         {
-            byte nextByteFromList = (Byte) list.get(ii);
+            byte nextByteFromList = list.get(ii);
             assertEquals(testArray[ii - 100], nextByteFromList);
         }
     }
@@ -118,7 +118,7 @@ public class ArrayUtilTest extends TestCase
         assertEquals(true, booleanArray[1]);
         assertEquals(false, booleanArray[2]);
     }
-    
+
     public void testIndexOf()
     {
         byte[] testArray = new byte[] {1, 1, 5, 3, 4, 5, 7, 7, 8, 3, 2};
@@ -133,14 +133,14 @@ public class ArrayUtilTest extends TestCase
         assertEquals(10, ArrayUtil.indexOf(testArray, new byte[] {2}));
         assertEquals(2, ArrayUtil.indexOf(testArray, new byte[] {5, 3}));
         assertEquals(0, ArrayUtil.indexOf(testArray, new byte[] {}));
-        
+
         assertEquals(2, ArrayUtil.indexOf(testArray, new byte[] {5, 3}), 1);
         assertEquals(-1, ArrayUtil.indexOf(testArray, new byte[] {5, 3}), 5);
         assertEquals(-1, ArrayUtil.indexOf(testArray, testArray), 1);
         assertEquals(1, ArrayUtil.indexOf(testArray, new byte[] {1}), 1);
         assertEquals(6, ArrayUtil.indexOf(testArray, new byte[] {7, 7, 8}), 6);
     }
-    
+
     public void testConvertToObjectArray()
     {
         int[] intArray = new int[] {1, 2, 3};
@@ -163,7 +163,7 @@ public class ArrayUtilTest extends TestCase
         assertEquals(Boolean.TRUE, booleanWrappedArray[1]);
         assertEquals(Boolean.FALSE, booleanWrappedArray[2]);
     }
-    
+
     public void testConvertToPrimitiveArray()
     {
         Integer[] integerArray = new Integer[] {new Integer(1), new Integer(2), new Integer(3)};
@@ -184,7 +184,7 @@ public class ArrayUtilTest extends TestCase
         {
             ArrayUtil.convertToPrimitiveArray(new String[] {"1"});
             fail();
-        } 
+        }
         catch (IllegalArgumentException exc)
         {
             //should throw exception
@@ -193,13 +193,13 @@ public class ArrayUtilTest extends TestCase
         {
             ArrayUtil.convertToPrimitiveArray(new Integer[] {new Integer(1), null});
             fail();
-        } 
+        }
         catch (IllegalArgumentException exc)
         {
             //should throw exception
         }
     }
-    
+
     public void testConvertToArray()
     {
         int[] intArray = new int[] {1, 2, 3};
@@ -213,7 +213,7 @@ public class ArrayUtilTest extends TestCase
         assertTrue(((String[])array).length == 1);
         assertEquals("Test", ((String[])array)[0]);
     }
-    
+
     public void testCopyArray()
     {
         byte[] byteArray = new byte[] {1, 2, 3, 4, 5};
@@ -239,7 +239,7 @@ public class ArrayUtilTest extends TestCase
         assertSame(firstStringArray, copy2Dim[0]);
         assertSame(secondStringArray, copy2Dim[1]);
     }
-    
+
     public void testAreArraysEqual()
     {
         assertTrue(ArrayUtil.areArraysEqual(null, null));
@@ -262,7 +262,7 @@ public class ArrayUtilTest extends TestCase
         String[][][] dim3Array = new String[][][] {{{"1"}}, {{"2"}}, {{"3"}}};
         assertTrue(ArrayUtil.areArraysEqual(dim3Array, dim3Array));
     }
-    
+
     public void testComputeHashCode()
     {
         assertEquals(0, ArrayUtil.computeHashCode(null));
@@ -271,7 +271,7 @@ public class ArrayUtilTest extends TestCase
         assertEquals(16369, ArrayUtil.computeHashCode(new byte[] {1, 1}));
         assertFalse(ArrayUtil.computeHashCode(new String[] {"1", "2"}) == ArrayUtil.computeHashCode(new String[] {"1", "2", "3"}));
     }
-    
+
     public void testEnsureUnique()
     {
         String[] testArray = new String[] {"test1", "test2"};

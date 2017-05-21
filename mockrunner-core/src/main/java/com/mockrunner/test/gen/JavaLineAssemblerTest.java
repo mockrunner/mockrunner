@@ -10,22 +10,23 @@ import com.mockrunner.gen.proc.JavaLineAssembler;
 public class JavaLineAssemblerTest extends TestCase
 {
     private final static String NL = System.getProperty("line.separator");
-    
+
     private JavaLineAssembler assembler;
-     
-    protected void setUp() throws Exception
+
+    @Override
+  protected void setUp() throws Exception
     {
         super.setUp();
         assembler = new JavaLineAssembler();
     }
-    
+
     public void testReset()
     {
         assembler.appendLine("xyz");
         assembler.reset();
         assertEquals("", assembler.getResult());
     }
-    
+
     public void testAppendBlankAndNewline()
     {
         assembler.appendBlank(3);
@@ -34,7 +35,7 @@ public class JavaLineAssemblerTest extends TestCase
         assembler.appendNewLine();
         assertEquals("    " + NL + NL + NL + NL , assembler.getResult());
     }
-    
+
     public void testAppendLine()
     {
         assembler.appendLine(null);
@@ -44,7 +45,7 @@ public class JavaLineAssemblerTest extends TestCase
         assembler.appendLine("testLine");
         assertEquals("testLine" + NL, assembler.getResult());
     }
-    
+
     public void testAppendCodeLines()
     {
         assembler.appendCodeLines(null);
@@ -62,7 +63,7 @@ public class JavaLineAssemblerTest extends TestCase
                           "Line5" + NL;
         assertEquals(expected, assembler.getResult());
     }
-    
+
     public void testAppendIndent()
     {
         assembler.appendIndent();
@@ -75,7 +76,7 @@ public class JavaLineAssemblerTest extends TestCase
         assembler.appendLine("testLine");
         assertEquals("    testLine" + NL, assembler.getResult());
     }
-    
+
     public void testAppendPackageInfo()
     {
         assembler.appendPackageInfo(null);
@@ -85,24 +86,24 @@ public class JavaLineAssemblerTest extends TestCase
         assembler.appendPackageInfo("myPackage");
         assertEquals("package myPackage;" + NL + NL, assembler.getResult());
     }
-    
+
     public void testAppendImports()
     {
         assembler.appendImports(null);
         assertEquals("", assembler.getResult());
-        assembler.appendImports(new ArrayList());
+        assembler.appendImports(new ArrayList<>());
         assertEquals("", assembler.getResult());
         assembler.appendImport("com.MyClass");
         assertEquals("import com.MyClass;" + NL, assembler.getResult());
         assembler.reset();
-        List importList = new ArrayList();
+        List<String> importList = new ArrayList<>();
         importList.add("com.MyClass1");
         importList.add("com.MyClass2");
         importList.add("com.MyClass3");
         assembler.appendImports(importList);
-        assertEquals("import com.MyClass1;" + NL + "import com.MyClass2;" + NL + "import com.MyClass3;" + NL, assembler.getResult()); 
+        assertEquals("import com.MyClass1;" + NL + "import com.MyClass2;" + NL + "import com.MyClass3;" + NL, assembler.getResult());
     }
-    
+
     public void testAppendClassDefintion()
     {
         assembler.appendClassDefintion(null);
@@ -124,7 +125,7 @@ public class JavaLineAssemblerTest extends TestCase
         assembler.appendClassDefintion("MyClass", "abstract", "", null);
         assertEquals("public abstract class MyClass" + NL, assembler.getResult());
     }
-    
+
     public void testAppendClassDefintionWithSuperClass()
     {
         assembler.appendClassDefintion(null, "MySuperClass");
@@ -137,7 +138,7 @@ public class JavaLineAssemblerTest extends TestCase
         assembler.appendClassDefintion("MyClass", "", "MySuperClass", null);
         assertEquals("public class MyClass extends MySuperClass" + NL, assembler.getResult());
     }
-    
+
     public void testAppendClassDefintionWithInterfaces()
     {
         assembler.appendClassDefintion(null, new String[] {"1"});
@@ -153,14 +154,14 @@ public class JavaLineAssemblerTest extends TestCase
         assembler.appendClassDefintion("MyClass", "", "", new String[] {"1", "2"});
         assertEquals("public class MyClass implements 1, 2" + NL, assembler.getResult());
     }
-    
+
     public void testAppendClassDefintionWithSuperClassAndInterfaces()
     {
         assembler.setIndentLevel(2);
         assembler.appendClassDefintion("MyClass", "", "MySuperClass", new String[] {"1", "2"});
         assertEquals("        public class MyClass extends MySuperClass implements 1, 2" + NL, assembler.getResult());
     }
-    
+
     public void testAppendMemberDeclaration()
     {
         assembler.setIndentLevel(1);
@@ -171,7 +172,7 @@ public class JavaLineAssemblerTest extends TestCase
         assembler.appendMemberDeclaration("MyType", "myName");
         assertEquals("    private MyType myName;" + NL, assembler.getResult());
     }
-    
+
     public void testAppendMethodDeclaration()
     {
         assembler.setIndentLevel(2);
@@ -187,7 +188,7 @@ public class JavaLineAssemblerTest extends TestCase
         assembler.appendMethodDeclaration("myMethod");
         assertEquals("    protected void myMethod()" + NL, assembler.getResult());
     }
-    
+
     public void testAppendMethodDeclarationWithReturnType()
     {
         assembler.setIndentLevel(2);
@@ -204,7 +205,7 @@ public class JavaLineAssemblerTest extends TestCase
         assembler.appendMethodDeclaration("MyReturnType", "myMethod");
         assertEquals("MyReturnType myMethod()" + NL, assembler.getResult());
     }
-    
+
     public void testAppendMethodDeclarationWithReturnTypeAndParameters()
     {
         assembler.appendMethodDeclaration("MyReturnType", "", new String[] {"1"}, new String[] {"2"});
@@ -234,7 +235,7 @@ public class JavaLineAssemblerTest extends TestCase
         assembler.appendMethodDeclaration("MyReturnType", "myMethod",  types, names);
         assertEquals("private MyReturnType myMethod(String string0, int int1, Integer int2, double double3)" + NL, assembler.getResult());
     }
-    
+
     public void testAppendMethodDeclarationWithReturnTypeParametersAndModifiers()
     {
         assembler.appendMethodDeclaration(new String[] {"abstract"}, "MyReturnType", "", new String[] {"1"}, new String[] {"2"});
@@ -251,7 +252,7 @@ public class JavaLineAssemblerTest extends TestCase
         assembler.appendMethodDeclaration(modifiers, "MyReturnType", "myMethod",  types, names);
         assertEquals("abstract synchronized MyReturnType myMethod(String string0, int int1, Integer int2, double param3)" + NL, assembler.getResult());
     }
-    
+
     public void testAppendMethodDeclarationWithReturnTypeParametersModifiersAndExceptions()
     {
         assembler.setDefaultMethodModifier("public");
@@ -265,9 +266,9 @@ public class JavaLineAssemblerTest extends TestCase
         assertEquals("abstract synchronized MyReturnType myMethod(String string0, int int1, Integer int2, double param3)" + NL, assembler.getResult());
         assembler.reset();
         assembler.appendMethodDeclaration(modifiers, null, "myMethod",  null, null, new String[] {"Exception"});
-        assertEquals("abstract synchronized void myMethod() throws Exception" + NL, assembler.getResult());   
+        assertEquals("abstract synchronized void myMethod() throws Exception" + NL, assembler.getResult());
     }
-    
+
     public void testAppendConstructorDeclaration()
     {
         assembler.setIndentLevel(1);
@@ -278,7 +279,7 @@ public class JavaLineAssemblerTest extends TestCase
         assembler.appendConstructorDeclaration("MyConstructor");
         assertEquals("    public MyConstructor()" + NL, assembler.getResult());
     }
-    
+
     public void testAppendConstructorDeclarationWithParameters()
     {
         assembler.setIndentLevel(1);
@@ -291,7 +292,7 @@ public class JavaLineAssemblerTest extends TestCase
         assembler.appendConstructorDeclaration("MyConstructor", types, names);
         assertEquals("    public MyConstructor(String string0, int int1, Integer int2, double param3)" + NL, assembler.getResult());
     }
-    
+
     public void testAppendConstructorDeclarationWithParametersAndExceptions()
     {
         assembler.setIndentLevel(1);
@@ -303,7 +304,7 @@ public class JavaLineAssemblerTest extends TestCase
         assembler.appendConstructorDeclaration("MyConstructor", types, names, exceptions);
         assertEquals("    public MyConstructor(String string0, int int1, Integer int2, double param3) throws Exception1, Exception2, Exception3" + NL, assembler.getResult());
     }
-    
+
     public void testAppendComment()
     {
         assembler.setIndentLevel(1);
@@ -314,7 +315,7 @@ public class JavaLineAssemblerTest extends TestCase
         assembler.appendComment("this is a comment");
         assertEquals("    //this is a comment" + NL, assembler.getResult());
     }
-    
+
     public void testAppendBlockComment()
     {
         assembler.setIndentLevel(1);
@@ -338,7 +339,7 @@ public class JavaLineAssemblerTest extends TestCase
                    " */" + NL;
         assertEquals(expected, assembler.getResult());
     }
-    
+
     public void testAppendJavaDocComment()
     {
         assembler.setIndentLevel(1);
