@@ -5,7 +5,6 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -41,16 +40,17 @@ import com.mockrunner.tag.TagTestModule;
 
 public class AdapterConsistencyTest extends TestCase
 {
-    private Map adapterMap;
-    private Map exceptionMap;
-    private List failureList;
-    
-    protected void setUp() throws Exception
+    private Map<Class<?>, List<Class<?>>> adapterMap;
+    private Map<Class<?>, List<String>> exceptionMap;
+    private List<FailureEntry> failureList;
+
+    @Override
+  protected void setUp() throws Exception
     {
         super.setUp();
-        failureList = new ArrayList();
-        adapterMap = new HashMap();
-        exceptionMap = new HashMap();
+        failureList = new ArrayList<>();
+        adapterMap = new HashMap<>();
+        exceptionMap = new HashMap<>();
         initializeTestModules();
     }
 
@@ -59,71 +59,69 @@ public class AdapterConsistencyTest extends TestCase
         addAdapter(ServletTestModule.class, ServletTestCaseAdapter.class);
         addAdapter(ServletTestModule.class, BasicServletTestCaseAdapter.class);
         addExceptionMethod(ServletTestModule.class, "getOutput");
-        
+
         addAdapter(TagTestModule.class, TagTestCaseAdapter.class);
         addAdapter(TagTestModule.class, BasicTagTestCaseAdapter.class);
         addExceptionMethod(TagTestModule.class, "getOutput");
-        
+
         addAdapter(ActionTestModule.class, ActionTestCaseAdapter.class);
         addAdapter(ActionTestModule.class, BasicActionTestCaseAdapter.class);
         addExceptionMethod(ActionTestModule.class, "getOutput");
-        
+
         addAdapter(EJBTestModule.class, EJBTestCaseAdapter.class);
         addAdapter(EJBTestModule.class, BasicEJBTestCaseAdapter.class);
-        
+
         addAdapter(JDBCTestModule.class, JDBCTestCaseAdapter.class);
         addAdapter(JDBCTestModule.class, BasicJDBCTestCaseAdapter.class);
-        
+
 //        addAdapter(JMSTestModule.class, JMSTestCaseAdapter.class);
 //        addAdapter(JMSTestModule.class, BasicJMSTestCaseAdapter.class);
-        
+
         addAdapter(ConnectorTestModule.class, ConnectorTestCaseAdapter.class);
         addAdapter(ConnectorTestModule.class, BasicConnectorTestCaseAdapter.class);
-        
+
         addAdapter(HTMLOutputModule.class, HTMLOutputTestCase.class);
         addAdapter(HTMLOutputModule.class, BasicHTMLOutputTestCase.class);
-        
+
         addAdapter(WebTestModule.class, WebTestCase.class);
         addAdapter(WebTestModule.class, BasicWebTestCase.class);
     }
-    
-    protected void addAdapter(Class module, Class adapter)
+
+    protected void addAdapter(Class<?> module, Class<?> adapter)
     {
-        List adapterList = (List)adapterMap.get(module);
+        List<Class<?>> adapterList = adapterMap.get(module);
         if(null == adapterList)
         {
-            adapterList = new ArrayList();
+            adapterList = new ArrayList<>();
             adapterMap.put(module, adapterList);
-            exceptionMap.put(module, new ArrayList());
+            exceptionMap.put(module, new ArrayList<>());
         }
         adapterList.add(adapter);
     }
-    
-    protected void addExceptionMethod(Class module, String method)
+
+    protected void addExceptionMethod(Class<?> module, String method)
     {
-        List exceptionList = (List)exceptionMap.get(module);
+        List<String> exceptionList = exceptionMap.get(module);
         if(null == exceptionList)
         {
-            exceptionList = new ArrayList();
+            exceptionList = new ArrayList<>();
             exceptionMap.put(module, exceptionList);
         }
         exceptionList.add(method);
     }
-    
+
     public void testAdapterConsistency()
     {
-        for (Object o : adapterMap.keySet()) {
-            Class currentModule = (Class) o;
-            List adapterList = (List) adapterMap.get(currentModule);
-            for (Object anAdapterList : adapterList) {
-                Class currentAdapter = (Class) anAdapterList;
+        for (Class<?> currentModule : adapterMap.keySet()) {
+            List<Class<?>> adapterList = adapterMap.get(currentModule);
+            for (Class<?> currentAdapter : adapterList) {
                 doTestAdapter(currentModule, currentAdapter);
             }
         }
         dumpFailures();
     }
-    
-    private void doTestAdapter(Class currentModule, Class currentAdapter)
+
+    private void doTestAdapter(Class<?> currentModule, Class<?> currentAdapter)
     {
         Method[] adapterMethods = currentAdapter.getDeclaredMethods();
         Method[] moduleMethods = currentModule.getDeclaredMethods();
@@ -136,13 +134,13 @@ public class AdapterConsistencyTest extends TestCase
         }
     }
 
-    private boolean shouldMethodBeChecked(Method theMethod, Class module)
+    private boolean shouldMethodBeChecked(Method theMethod, Class<?> module)
     {
         if(!Modifier.isPublic(theMethod.getModifiers())) return false;
-        List exceptionMethods = (List)exceptionMap.get(module);
+        List<String> exceptionMethods = exceptionMap.get(module);
         return !(null != exceptionMethods && exceptionMethods.contains(theMethod.getName()));
     }
-    
+
     private boolean isMethodDeclared(Method theMethod, Method[] otherClassMethods)
     {
         for (Method currentMethod : otherClassMethods) {
@@ -152,38 +150,37 @@ public class AdapterConsistencyTest extends TestCase
         }
         return false;
     }
-    
+
     private boolean areMethodsEqual(Method aMethod, Method anotherMethod)
     {
         if(Modifier.isPrivate(anotherMethod.getModifiers())) return false;
         if(!aMethod.getName().equals(anotherMethod.getName())) return false;
         if(!aMethod.getReturnType().equals(anotherMethod.getReturnType())) return false;
-        Class[] aMethodParams = aMethod.getParameterTypes();
-        Class[] anotherMethodParams = anotherMethod.getParameterTypes();
+        Class<?>[] aMethodParams = aMethod.getParameterTypes();
+        Class<?>[] anotherMethodParams = anotherMethod.getParameterTypes();
         return Arrays.equals(aMethodParams, anotherMethodParams);
     }
-    
-    private void addFailureEntry(Class currentModule, Class currentAdapter, Method missingMethod)
+
+    private void addFailureEntry(Class<?> currentModule, Class<?> currentAdapter, Method missingMethod)
     {
         failureList.add(new FailureEntry(currentModule, currentAdapter, missingMethod));
     }
-    
+
     private void dumpFailures()
     {
-        for (Object aFailureList : failureList) {
-            FailureEntry currentEntry = (FailureEntry) aFailureList;
-            Class currentModule = currentEntry.getModule();
-            Class currentAdapter = currentEntry.getAdapter();
+        for (FailureEntry currentEntry : failureList) {
+            Class<?> currentModule = currentEntry.getModule();
+            Class<?> currentAdapter = currentEntry.getAdapter();
             Method currentMethod = currentEntry.getMethod();
             System.out.println("Failure in " + currentAdapter.getName() + " (Module: " + currentModule.getName() + ")");
             System.out.println("The following method is missing:");
             System.out.println();
-            Class[] params = currentMethod.getParameterTypes();
+            Class<?>[] params = currentMethod.getParameterTypes();
             System.out.println("Name: " + currentMethod.getName());
             System.out.println("Return type: " + currentMethod.getReturnType().getName());
             if (null != params && params.length > 0) {
                 System.out.print("Parameter: ");
-                for (Class currentParam : params) {
+                for (Class<?> currentParam : params) {
                     System.out.print(currentParam.getName() + "; ");
                 }
                 System.out.println();
@@ -192,31 +189,31 @@ public class AdapterConsistencyTest extends TestCase
         }
         assertTrue(failureList.isEmpty());
     }
-    
+
     private class FailureEntry
     {
-        private Class module;
-        private Class adapter;
+        private Class<?> module;
+        private Class<?> adapter;
         private Method method;
-        
-        public FailureEntry(Class module, Class adapter, Method method)
+
+        public FailureEntry(Class<?> module, Class<?> adapter, Method method)
         {
             this.module = module;
             this.adapter = adapter;
             this.method = method;
         }
-        
-        public Class getAdapter()
+
+        public Class<?> getAdapter()
         {
             return adapter;
         }
-        
+
         public Method getMethod()
         {
             return method;
         }
-        
-        public Class getModule()
+
+        public Class<?> getModule()
         {
             return module;
         }

@@ -10,6 +10,7 @@ import com.mockrunner.util.common.ClassUtil;
 
 public class BasicAdapterProcessor extends StandardAdapterProcessor
 {
+    @Override
     protected void addMemberDeclarations(JavaClassGenerator classGenerator, MemberInfo memberInfo)
     {
         super.addMemberDeclarations(classGenerator, memberInfo);
@@ -17,7 +18,8 @@ public class BasicAdapterProcessor extends StandardAdapterProcessor
         memberInfo.setFactoryMember(factoryName);
         classGenerator.addMemberDeclaration(memberInfo.getFactory(), factoryName);
     }
-    
+
+    @Override
     protected String[] getSetUpMethodCodeLines(MemberInfo memberInfo)
     {
         String[] codeLines = new String[2];
@@ -26,7 +28,8 @@ public class BasicAdapterProcessor extends StandardAdapterProcessor
         codeLines[1] = memberInfo.getModuleMember() + " = create" + ClassUtil.getClassName(memberInfo.getModule()) + "(" + getFactoryCall +"());";
         return codeLines;
     }
-    
+
+    @Override
     protected String[] getTearDownMethodCodeLines(MemberInfo memberInfo)
     {
         String[] codeLines = new String[3];
@@ -35,7 +38,8 @@ public class BasicAdapterProcessor extends StandardAdapterProcessor
         codeLines[2] = memberInfo.getFactoryMember() + " = null;";
         return codeLines;
     }
-    
+
+    @Override
     protected void addAdditionalControlMethods(JavaClassGenerator classGenerator, MemberInfo memberInfo)
     {
         addCreateFactoryMethods(classGenerator, memberInfo);
@@ -44,7 +48,7 @@ public class BasicAdapterProcessor extends StandardAdapterProcessor
         addCreateModuleMethods(classGenerator, memberInfo);
         super.addAdditionalControlMethods(classGenerator, memberInfo);
     }
-    
+
     private void addGetFactoryLazyMethod(JavaClassGenerator classGenerator, MemberInfo memberInfo)
     {
         String[] codeLines = new String[8];
@@ -58,8 +62,9 @@ public class BasicAdapterProcessor extends StandardAdapterProcessor
         codeLines[7] = "return " + memberInfo.getFactoryMember() + ";";
         addGetMethod(classGenerator, memberInfo.getFactory(), codeLines);
     }
-    
-    protected String[] getClassComment(Class module)
+
+    @Override
+    protected String[] getClassComment(Class<?> module)
     {
         String link = getJavaDocLink(module);
         String[] comment = new String[9];
@@ -75,8 +80,9 @@ public class BasicAdapterProcessor extends StandardAdapterProcessor
         comment[8] = "and should not be edited directly</b>.";
         return comment;
     }
-    
-    protected Class getSuperClass(Class module)
+
+    @Override
+    protected Class<?> getSuperClass(Class<?> module)
     {
         if(HTMLOutputModule.class.isAssignableFrom(module))
         {
@@ -85,14 +91,15 @@ public class BasicAdapterProcessor extends StandardAdapterProcessor
         return TestCase.class;
     }
 
+    @Override
     protected String getClassNameFromBaseName(String className)
     {
         return "Basic" + className + "CaseAdapter";
     }
-    
+
     private void addCreateFactoryMethods(JavaClassGenerator classGenerator, MemberInfo memberInfo)
     {
-        Class factory = memberInfo.getFactory();
+        Class<?> factory = memberInfo.getFactory();
         MethodDeclaration createMethod = prepareCreateMethod(factory);
         String[] comment = new String[2];
         comment[0] = "Creates a " + getJavaDocLink(factory) + ".";
@@ -120,11 +127,11 @@ public class BasicAdapterProcessor extends StandardAdapterProcessor
             classGenerator.addMethodDeclaration(createMethod);
         }
     }
-    
+
     private void addCreateModuleMethods(JavaClassGenerator classGenerator, MemberInfo memberInfo)
     {
-        Class module = memberInfo.getModule();
-        Class factory = memberInfo.getFactory();
+        Class<?> module = memberInfo.getModule();
+        Class<?> factory = memberInfo.getFactory();
         MethodDeclaration createMethod = prepareCreateMethod(module);
         String[] comment = new String[4];
         comment[0] = "Creates a " + getJavaDocLink(module) + " based on the current";
@@ -147,13 +154,13 @@ public class BasicAdapterProcessor extends StandardAdapterProcessor
         createMethod.setCodeLines(codeLines);
         classGenerator.addMethodDeclaration(createMethod);
     }
-    
-    private String createGetFactoryMethodCall(Class factory)
+
+    private String createGetFactoryMethodCall(Class<?> factory)
     {
         return "get" + ClassUtil.getClassName(factory) + "()";
     }
-    
-    private MethodDeclaration prepareCreateMethod(Class clazz)
+
+    private MethodDeclaration prepareCreateMethod(Class<?> clazz)
     {
         String methodName = "create" + ClassUtil.getClassName(clazz);
         MethodDeclaration createMethod = createProtectedMethod();
@@ -161,8 +168,8 @@ public class BasicAdapterProcessor extends StandardAdapterProcessor
         createMethod.setReturnType(clazz);
         return createMethod;
     }
-    
-    private String[] getCreateMethodComment(Class factory)
+
+    private String[] getCreateMethodComment(Class<?> factory)
     {
         String link = getJavaDocLink(factory);
         String[] comment = new String[13];
