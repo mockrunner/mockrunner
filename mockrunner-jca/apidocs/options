@@ -1,0 +1,24 @@
+-classpath
+'/home/cemartins/Development/os/mockrunner/target/checkout/mockrunner-jca/target/classes:/home/cemartins/.m2/repository/regexp/regexp/1.2/regexp-1.2.jar:/home/cemartins/.m2/repository/nekohtml/nekohtml/0.9.5/nekohtml-0.9.5.jar:/home/cemartins/.m2/repository/jboss/jboss-j2ee/4.2.2.GA/jboss-j2ee-4.2.2.GA.jar:/home/cemartins/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/home/cemartins/.m2/repository/xml-apis/xml-apis/1.3.04/xml-apis-1.3.04.jar:/home/cemartins/.m2/repository/jakarta-regexp/jakarta-regexp/1.4/jakarta-regexp-1.4.jar:/home/cemartins/.m2/repository/bcel/bcel/5.1/bcel-5.1.jar:/home/cemartins/.m2/repository/com/mockrunner/mockrunner-core/2.0.1/mockrunner-core-2.0.1.jar:/home/cemartins/.m2/repository/com/kirkk/jaranalyzer/1.2/jaranalyzer-1.2.jar:/home/cemartins/.m2/repository/xerces/xercesImpl/2.9.0/xercesImpl-2.9.0.jar:/home/cemartins/.m2/repository/ant/ant/1.6.5/ant-1.6.5.jar:/home/cemartins/.m2/repository/jdom/jdom/1.0/jdom-1.0.jar:/home/cemartins/.m2/repository/oro/oro/2.0.8/oro-2.0.8.jar:/home/cemartins/.m2/repository/junit/junit/4.12/junit-4.12.jar'
+-encoding
+'UTF-8'
+-protected
+-sourcepath
+'/home/cemartins/Development/os/mockrunner/target/checkout/mockrunner-jca/src/main/java'
+-author
+-bottom
+'Copyright &#169; 2003-2018. All Rights Reserved.'
+-charset
+'UTF-8'
+-d
+'/home/cemartins/Development/os/mockrunner/target/checkout/mockrunner-jca/target/site/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'MockRunner-JCA 2.0.1 API'
+-link
+'http://java.sun.com/javase/6/docs/api'
+-use
+-version
+-windowtitle
+'MockRunner-JCA 2.0.1 API'

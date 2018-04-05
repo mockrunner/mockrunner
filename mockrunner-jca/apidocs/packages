@@ -1,0 +1,5 @@
+com.mockrunner.test.connector
+com.mockrunner.connector
+com.mockrunner.mock.connector.spi
+com.mockrunner.mock.connector.cci
+com.mockrunner.example.connector
