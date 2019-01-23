@@ -3,6 +3,7 @@ package com.mockrunner.test.httpserver;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
@@ -315,6 +316,56 @@ public class HttpServerTestModuleTest {
 
 		// And the status code is 200
 		assertEquals(200, statusCode);
+
+		try {
+			if (module != null) {
+				module.reset();
+				module.stop();
+			}
+		} catch (Exception e) {
+		}
+	}
+
+	@Test
+	public void testHttpServerTestModule_LoggingWithFileNameExtractorOk() throws ClientProtocolException, IOException {
+		defaultConfig.setModel(HttpServerConfig.Mode.LOGGING);
+		defaultConfig.setRequestFileDir(TEST_FILE_DIRECTORY);
+		defaultConfig.setResponseFileDir(TEST_FILE_DIRECTORY);
+		defaultConfig.setProxyPort(0);
+		FileNameExtractor fne = new FileNameExtractor() {
+			@Override
+			public String extractFileName(byte[] content) {
+				return "abcde";
+			}
+		};
+		defaultConfig.setFileNameExtractor(fne);
+		defaultConfig.setIgnoreFileErrors(true);
+		defaultConfig.setIgnoreAdditionalHeaders(true);
+		defaultConfig.setTargetDomain(TARGET_DOMAIN);
+
+		targetResponseProvider.expect(Method.GET, "/hello").respondWith(200, "application/json", "1024-OK");
+
+		HttpServerTestModule module = new HttpServerTestModule(defaultConfig);
+		int port = module.start();
+
+		// When a request for GET / arrives
+		String baseUrl = "http://localhost:" + port;
+		final HttpGet req = new HttpGet(baseUrl + "/hello");
+		final HttpResponse response = client.execute(req);
+		final String responseBody = IOUtils.toString(response.getEntity().getContent());
+		final int statusCode = response.getStatusLine().getStatusCode();
+
+		// Then the response is "OK"
+		assertEquals("1024-OK", responseBody);
+
+		// And the status code is 200
+		assertEquals(200, statusCode);
+
+		File requestFile = new File(TEST_FILE_DIRECTORY + "abcde_request_00001.txt");
+		assertTrue(requestFile.exists());
+
+		File responseFile = new File(TEST_FILE_DIRECTORY + "abcde_response_00001.txt");
+		assertTrue(responseFile.exists());
 
 		try {
 			if (module != null) {
@@ -857,6 +908,73 @@ public class HttpServerTestModuleTest {
 			}
 		} catch (Exception e) {
 		}
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testHttpServerTestModule_SaveToFileNoReuqest()
+			throws ClientProtocolException, IOException, UnsatisfiedExpectationException {
+		defaultConfig.setModel(HttpServerConfig.Mode.PARTICIALMOCKING);
+		defaultConfig.setRequestFileDir(TEST_FILE_DIRECTORY);
+		defaultConfig.setResponseFileDir(TEST_FILE_DIRECTORY);
+		defaultConfig.setProxyPort(0);
+		defaultConfig.setIgnoreFileErrors(true);
+		defaultConfig.setIgnoreAdditionalHeaders(true);
+		defaultConfig.setPartialMockingNeedLoggingFile(false);
+		defaultConfig.setTargetDomain(TARGET_DOMAIN);
+		defaultConfig.setOverrideFile(false);
+
+		HttpServerTestModule module = new HttpServerTestModule(defaultConfig);
+		module.saveToFile("TestSaveToFile");
+	}
+
+	@Test
+	public void testHttpServerTestModule_SaveToFileOnlyReuqest()
+			throws ClientProtocolException, IOException, UnsatisfiedExpectationException {
+		defaultConfig.setModel(HttpServerConfig.Mode.PARTICIALMOCKING);
+		defaultConfig.setRequestFileDir(TEST_FILE_DIRECTORY);
+		defaultConfig.setResponseFileDir(TEST_FILE_DIRECTORY);
+		defaultConfig.setProxyPort(0);
+		defaultConfig.setIgnoreFileErrors(true);
+		defaultConfig.setIgnoreAdditionalHeaders(true);
+		defaultConfig.setPartialMockingNeedLoggingFile(false);
+		defaultConfig.setTargetDomain(TARGET_DOMAIN);
+		defaultConfig.setOverrideFile(false);
+
+		HttpServerTestModule module = new HttpServerTestModule(defaultConfig);
+		module.expect(Method.GET, "/c/d?a=b", "application/json", "123456").saveToFile("TestSaveToFile");
+
+		File requestFile = new File(TEST_FILE_DIRECTORY + "TestSaveToFile_request_00001.txt");
+		assertTrue(requestFile.exists());
+
+		File requestEntityFile = new File(TEST_FILE_DIRECTORY + "TestSaveToFile_request_entity_00001.txt");
+		assertTrue(requestEntityFile.exists());
+	}
+
+	@Test
+	public void testHttpServerTestModule_SaveToFileReuqestAndReponse()
+			throws ClientProtocolException, IOException, UnsatisfiedExpectationException {
+		defaultConfig.setModel(HttpServerConfig.Mode.PARTICIALMOCKING);
+		defaultConfig.setRequestFileDir(TEST_FILE_DIRECTORY);
+		defaultConfig.setResponseFileDir(TEST_FILE_DIRECTORY);
+		defaultConfig.setProxyPort(0);
+		defaultConfig.setIgnoreFileErrors(true);
+		defaultConfig.setIgnoreAdditionalHeaders(true);
+		defaultConfig.setPartialMockingNeedLoggingFile(false);
+		defaultConfig.setTargetDomain(TARGET_DOMAIN);
+		defaultConfig.setOverrideFile(false);
+
+		HttpServerTestModule module = new HttpServerTestModule(defaultConfig);
+		module.expect(Method.GET, "/c/d?a=b", "application/json", null).respondWith(200, "xml", "responseEntity")
+				.saveToFile("TestSaveToFile2");
+
+		File requestFile = new File(TEST_FILE_DIRECTORY + "TestSaveToFile2_request_00001.txt");
+		assertTrue(requestFile.exists());
+
+		File responseFile = new File(TEST_FILE_DIRECTORY + "TestSaveToFile2_response_00001.txt");
+		assertTrue(responseFile.exists());
+
+		File responseEntityFile = new File(TEST_FILE_DIRECTORY + "TestSaveToFile2_response_entity_00001.txt");
+		assertTrue(responseEntityFile.exists());
 	}
 
 }

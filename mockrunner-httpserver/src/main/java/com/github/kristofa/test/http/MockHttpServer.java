@@ -57,6 +57,10 @@ public class MockHttpServer {
 					if (!StringUtils.isEmpty(expectedResponse.getContentType())) {
 						response.set("Content-Type", expectedResponse.getContentType());
 					}
+					// copy the response headers
+					for (HttpMessageHeader aHeader : expectedResponse.getHttpMessageHeaders()) {
+						response.set(aHeader.getName(), aHeader.getValue());
+					}
 					OutputStream body = null;
 					try {
 						body = response.getOutputStream();

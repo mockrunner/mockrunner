@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -25,6 +27,7 @@ import org.mockito.InOrder;
 import com.github.kristofa.test.http.ForwardHttpRequestBuilder;
 import com.github.kristofa.test.http.FullHttpRequest;
 import com.github.kristofa.test.http.FullHttpRequestImpl;
+import com.github.kristofa.test.http.HttpMessageHeader;
 import com.github.kristofa.test.http.HttpRequestResponseLogger;
 import com.github.kristofa.test.http.HttpRequestResponseLoggerFactory;
 import com.github.kristofa.test.http.HttpResponseImpl;
@@ -126,7 +129,12 @@ public class PartialMockingHttpServerTest {
 		expectedRequest.httpMessageHeader("User-Agent", "Apache-HttpClient/4.2.5 (java 1.5)");
 		expectedRequest.port(-1);
 
-		final HttpResponseImpl expectedResponse = new HttpResponseImpl(200, "text/plain", "OK".getBytes());
+		Set<HttpMessageHeader> httpMessageHeaders = new HashSet<HttpMessageHeader>();
+		httpMessageHeaders.add(new HttpMessageHeader("Connection", "keep-alive"));
+		httpMessageHeaders.add(new HttpMessageHeader("Content-Type", "text/plain"));
+		httpMessageHeaders.add(new HttpMessageHeader("Transfer-Encoding", "chunked"));
+		final HttpResponseImpl expectedResponse = new HttpResponseImpl(200, "text/plain", "OK".getBytes(),
+				httpMessageHeaders);
 
 		final InOrder inOrder = inOrder(mockLoggerFactory, mockLogger);
 		inOrder.verify(mockLoggerFactory).getHttpRequestResponseLogger();
@@ -161,7 +169,12 @@ public class PartialMockingHttpServerTest {
 		expectedRequest.httpMessageHeader("User-Agent", "Apache-HttpClient/4.2.5 (java 1.5)");
 		expectedRequest.port(-1);
 
-		HttpResponseImpl expectedResponse = new HttpResponseImpl(200, "text/plain", "OK".getBytes());
+		Set<HttpMessageHeader> httpMessageHeaders = new HashSet<HttpMessageHeader>();
+		httpMessageHeaders.add(new HttpMessageHeader("Connection", "keep-alive"));
+		httpMessageHeaders.add(new HttpMessageHeader("Content-Type", "text/plain"));
+		httpMessageHeaders.add(new HttpMessageHeader("Transfer-Encoding", "chunked"));
+		HttpResponseImpl expectedResponse = new HttpResponseImpl(200, "text/plain", "OK".getBytes(),
+				httpMessageHeaders);
 
 		InOrder inOrder = inOrder(mockLoggerFactory, mockLogger);
 		inOrder.verify(mockLoggerFactory).getHttpRequestResponseLogger();

@@ -9,6 +9,8 @@ import org.simpleframework.http.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mockrunner.httpserver.util.StringUtils;
+
 /**
  * Converts a Simple framerwork {@link Request} into a {@link FullHttpRequest}.
  * 
@@ -38,14 +40,22 @@ public class RequestConvertor {
 		httpRequest.port(request.getAddress().getPort());
 		httpRequest.method(Method.valueOf(request.getMethod()));
 		httpRequest.path(request.getPath().getPath());
+		httpRequest.setClientIp(StringUtils.getIpStr(request.getClientAddress().getAddress().getAddress()));
+		httpRequest.setClientPort(String.valueOf(request.getClientAddress().getPort()));
 		if (data.length > 0) {
 			httpRequest.content(data);
 		}
 
 		for (final String headerField : request.getNames()) {
-			for (final String headerFieldValue : request.getValues(headerField)) {
-				httpRequest.httpMessageHeader(headerField, headerFieldValue);
+			// special handle the Accept head
+			if ("Accept".equals(headerField)) {
+				httpRequest.httpMessageHeader(headerField, request.getValue(headerField));
+			} else {
+				for (final String headerFieldValue : request.getValues(headerField)) {
+					httpRequest.httpMessageHeader(headerField, headerFieldValue);
+				}
 			}
+
 		}
 
 		for (final Entry<String, String> entry : request.getQuery().entrySet()) {

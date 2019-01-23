@@ -36,6 +36,20 @@ public abstract class AbstractHttpResponseProvider implements HttpResponseProvid
 	private HttpRequestMatchingFilter requestMatcherFilter;
 	private boolean initialized = false;
 
+	private HttpRequestMatcher matcher;
+
+	public AbstractHttpResponseProvider() {
+		this(new DefaultEqualsHttpRequestMatcher());
+	}
+
+	public AbstractHttpResponseProvider(HttpRequestMatcher matcher) {
+		this.matcher = matcher;
+	}
+
+	public void getMatcher(HttpRequestMatcher matcher) {
+		this.matcher = matcher;
+	}
+
 	/**
 	 * Adds an expected HttpRequest and response proxy combination.
 	 * 
@@ -121,27 +135,6 @@ public abstract class AbstractHttpResponseProvider implements HttpResponseProvid
 		if (responseProxyForExactMatchingRequest != null) {
 			return responseProxyForExactMatchingRequest.consume();
 		}
-		// Non exact matching...
-		if (requestMatcherFilter != null) {
-			for (final HttpRequest originalRequest : requestMap.keySet()) {
-				final HttpResponseProxy originalResponseProxy = getFirstNotYetConsumedResponseProxyFor(originalRequest);
-				if (originalResponseProxy == null) {
-					continue;
-				}
-				HttpRequestMatchingContext context = new HttpRequestMatchingContextImpl(originalRequest, request,
-						originalResponseProxy.getResponse());
-				HttpRequestMatchingFilter next = requestMatcherFilter;
-				while (next != null) {
-					context = next.filter(context);
-					if (context.originalRequest().equals(context.otherRequest())) {
-						originalResponseProxy.consume();
-						return context.response();
-					}
-					next = next.next();
-				}
-			}
-		}
-
 		unexpectedRequests.add(request);
 		return null;
 	}
@@ -191,11 +184,39 @@ public abstract class AbstractHttpResponseProvider implements HttpResponseProvid
 	}
 
 	private HttpResponseProxy getFirstNotYetConsumedResponseProxyFor(final HttpRequest request) {
-		final List<HttpResponseProxy> list = requestMap.get(request);
-		if (list != null) {
-			for (final HttpResponseProxy proxy : list) {
+		for (final Map.Entry<HttpRequest, List<HttpResponseProxy>> originalRequestEntry : requestMap.entrySet()) {
+			HttpRequest originalRequest = originalRequestEntry.getKey();
+			HttpResponseProxy originalResponseProxy = null;
+			for (final HttpResponseProxy proxy : originalRequestEntry.getValue()) {
 				if (!proxy.consumed()) {
-					return proxy;
+					originalResponseProxy = proxy;
+					break;
+				}
+			}
+
+			if (originalResponseProxy == null) {
+				continue;
+			}
+
+			HttpRequestMatchingContext context = new HttpRequestMatchingContextImpl(originalRequest, request,
+					originalResponseProxy.getResponse());
+
+			// first exact, then filter
+			if (matcher.match(context)) {
+				return originalResponseProxy;
+			}
+
+			if (requestMatcherFilter != null) {
+				HttpRequestMatchingFilter next = requestMatcherFilter;
+				while (next != null) {
+					context = next.filter(context);
+					if (matcher.match(context)) {
+						originalResponseProxy.consume();
+						DefaultHttpResponseProxy defaultHttpResponseProxy = new DefaultHttpResponseProxy(
+								context.response());
+						return defaultHttpResponseProxy;
+					}
+					next = next.next();
 				}
 			}
 		}

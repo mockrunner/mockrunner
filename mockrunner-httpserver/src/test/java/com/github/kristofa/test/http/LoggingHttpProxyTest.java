@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -24,103 +26,152 @@ import org.mockito.InOrder;
 
 public class LoggingHttpProxyTest {
 
-    private final static int PROXY_PORT = 51234;
-    private final String PROXY_URL = "http://localhost:" + PROXY_PORT;
-    private final static int PORT = 51233;
+	private final static int PROXY_PORT = 51234;
+	private final String PROXY_URL = "http://localhost:" + PROXY_PORT;
+	private final static int PORT = 51233;
 
-    private LoggingHttpProxy proxy;
-    private MockHttpServer server;
-    private HttpClient client;
-    private HttpRequestResponseLoggerFactory mockLoggerFactory;
-    private HttpRequestResponseLogger mockLogger;
-    private SimpleHttpResponseProvider responseProvider;
+	private LoggingHttpProxy proxy;
+	private MockHttpServer server;
+	private HttpClient client;
+	private HttpRequestResponseLoggerFactory mockLoggerFactory;
+	private HttpRequestResponseLogger mockLogger;
+	private SimpleHttpResponseProvider responseProvider;
+	private Set<HttpMessageHeader> httpMessageHeaders;
 
-    @Before
-    public void setup() throws Exception {
+	@Before
+	public void setup() throws Exception {
 
-        final ForwardHttpRequestBuilder forwardHttpRequestBuilder = new ForwardHttpRequestBuilder() {
+		final ForwardHttpRequestBuilder forwardHttpRequestBuilder = new ForwardHttpRequestBuilder() {
 
-            @Override
-            public FullHttpRequest getForwardRequest(final FullHttpRequest request) {
-                final FullHttpRequestImpl forwardRequest = new FullHttpRequestImpl(request);
-                forwardRequest.port(PORT);
-                forwardRequest.domain("localhost");
-                return forwardRequest;
-            }
-        };
+			@Override
+			public FullHttpRequest getForwardRequest(final FullHttpRequest request) {
+				final FullHttpRequestImpl forwardRequest = new FullHttpRequestImpl(request);
+				forwardRequest.port(PORT);
+				forwardRequest.domain("localhost");
+				return forwardRequest;
+			}
+		};
 
-        mockLoggerFactory = mock(HttpRequestResponseLoggerFactory.class);
-        mockLogger = mock(HttpRequestResponseLogger.class);
-        when(mockLoggerFactory.getHttpRequestResponseLogger()).thenReturn(mockLogger);
+		mockLoggerFactory = mock(HttpRequestResponseLoggerFactory.class);
+		mockLogger = mock(HttpRequestResponseLogger.class);
+		when(mockLoggerFactory.getHttpRequestResponseLogger()).thenReturn(mockLogger);
 
-        proxy = new LoggingHttpProxy(PROXY_PORT, Arrays.asList(forwardHttpRequestBuilder), mockLoggerFactory);
-        proxy.start();
+		proxy = new LoggingHttpProxy(PROXY_PORT, Arrays.asList(forwardHttpRequestBuilder), mockLoggerFactory);
+		proxy.start();
 
-        responseProvider = new SimpleHttpResponseProvider();
-        server = new MockHttpServer(PORT, responseProvider);
-        server.start();
+		responseProvider = new SimpleHttpResponseProvider();
+		server = new MockHttpServer(PORT, responseProvider);
+		server.start();
 
-        client = new DefaultHttpClient();
-    }
+		httpMessageHeaders = new HashSet<HttpMessageHeader>();
+		httpMessageHeaders.add(new HttpMessageHeader("hello", "world"));
+		httpMessageHeaders.add(new HttpMessageHeader("zero", "mq"));
 
-    @After
-    public void tearDown() throws Exception {
-        proxy.stop();
-        server.stop();
-        client.getConnectionManager().shutdown();
-    }
+		client = new DefaultHttpClient();
+	}
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullForwardRequestBuilder() {
-        new LoggingHttpProxy(PROXY_PORT, null, mockLoggerFactory);
-    }
+	@After
+	public void tearDown() throws Exception {
+		proxy.stop();
+		server.stop();
+		client.getConnectionManager().shutdown();
+	}
 
-    @Test(expected = IllegalArgumentException.class)
-    public void noForwardRequestBuilder() {
+	@Test(expected = IllegalArgumentException.class)
+	public void nullForwardRequestBuilder() {
+		new LoggingHttpProxy(PROXY_PORT, null, mockLoggerFactory);
+	}
 
-        final Collection<ForwardHttpRequestBuilder> emptyCollection = Collections.emptyList();
-        new LoggingHttpProxy(PROXY_PORT, emptyCollection, mockLoggerFactory);
-    }
+	@Test(expected = IllegalArgumentException.class)
+	public void noForwardRequestBuilder() {
 
-    @Test(expected = NullPointerException.class)
-    public void nullRequestResponseLogger() {
+		final Collection<ForwardHttpRequestBuilder> emptyCollection = Collections.emptyList();
+		new LoggingHttpProxy(PROXY_PORT, emptyCollection, mockLoggerFactory);
+	}
 
-        final ForwardHttpRequestBuilder mockRequestBuilder = mock(ForwardHttpRequestBuilder.class);
-        new LoggingHttpProxy(PROXY_PORT, Arrays.asList(mockRequestBuilder), null);
-    }
+	@Test(expected = NullPointerException.class)
+	public void nullRequestResponseLogger() {
 
-    @Test
-    public void successfulForwardRequestTest() throws ClientProtocolException, IOException {
+		final ForwardHttpRequestBuilder mockRequestBuilder = mock(ForwardHttpRequestBuilder.class);
+		new LoggingHttpProxy(PROXY_PORT, Arrays.asList(mockRequestBuilder), null);
+	}
 
-        // Given a mock server configured to respond to a GET / with "OK"
-        responseProvider.expect(Method.GET, "/").respondWith(200, "text/plain", "OK");
+	@Test
+	public void successfulForwardRequestTest() throws ClientProtocolException, IOException {
 
-        final HttpGet req = new HttpGet(PROXY_URL + "/");
-        final HttpResponse response = client.execute(req);
-        final String responseBody = IOUtils.toString(response.getEntity().getContent());
-        final int statusCode = response.getStatusLine().getStatusCode();
+		// Given a mock server configured to respond to a GET / with "OK"
+		responseProvider.expect(Method.GET, "/").respondWith(200, "text/plain", "OK");
 
-        // Then the response is "OK"
-        assertEquals("OK", responseBody);
-        // And the status code is 200
-        assertEquals(200, statusCode);
+		final HttpGet req = new HttpGet(PROXY_URL + "/");
+		final HttpResponse response = client.execute(req);
+		final String responseBody = IOUtils.toString(response.getEntity().getContent());
+		final int statusCode = response.getStatusLine().getStatusCode();
 
-        final FullHttpRequestImpl expectedRequest = new FullHttpRequestImpl();
-        expectedRequest.method(Method.GET);
-        expectedRequest.path("/");
-        expectedRequest.httpMessageHeader("Connection", "Keep-Alive");
-        expectedRequest.httpMessageHeader("Host", "localhost:51234");
-        expectedRequest.httpMessageHeader("User-Agent", "Apache-HttpClient/4.2.5 (java 1.5)");
-        expectedRequest.port(-1);
+		// Then the response is "OK"
+		assertEquals("OK", responseBody);
+		// And the status code is 200
+		assertEquals(200, statusCode);
 
-        final HttpResponseImpl expectedResponse = new HttpResponseImpl(200, "text/plain", "OK".getBytes());
+		final FullHttpRequestImpl expectedRequest = new FullHttpRequestImpl();
+		expectedRequest.method(Method.GET);
+		expectedRequest.path("/");
+		expectedRequest.httpMessageHeader("Connection", "Keep-Alive");
+		expectedRequest.httpMessageHeader("Host", "localhost:51234");
+		expectedRequest.httpMessageHeader("User-Agent", "Apache-HttpClient/4.2.5 (java 1.5)");
+		expectedRequest.port(-1);
 
-        final InOrder inOrder = inOrder(mockLoggerFactory, mockLogger);
-        inOrder.verify(mockLoggerFactory).getHttpRequestResponseLogger();
-        inOrder.verify(mockLogger).log(expectedRequest);
-        inOrder.verify(mockLogger).log(expectedResponse);
-        verifyNoMoreInteractions(mockLogger, mockLoggerFactory, mockLogger);
+		Set<HttpMessageHeader> httpMessageHeaders = new HashSet<HttpMessageHeader>();
+		httpMessageHeaders.add(new HttpMessageHeader("Connection", "keep-alive"));
+		httpMessageHeaders.add(new HttpMessageHeader("Content-Type", "text/plain"));
+		httpMessageHeaders.add(new HttpMessageHeader("Transfer-Encoding", "chunked"));
+		final HttpResponseImpl expectedResponse = new HttpResponseImpl(200, "text/plain", "OK".getBytes(),
+				httpMessageHeaders);
 
-    }
+		final InOrder inOrder = inOrder(mockLoggerFactory, mockLogger);
+		inOrder.verify(mockLoggerFactory).getHttpRequestResponseLogger();
+		inOrder.verify(mockLogger).log(expectedRequest);
+		inOrder.verify(mockLogger).log(expectedResponse);
+		verifyNoMoreInteractions(mockLogger, mockLoggerFactory, mockLogger);
+
+	}
+
+	@Test
+	public void successfulForwardRequestTestWithMessageHeaders() throws ClientProtocolException, IOException {
+
+		// Given a mock server configured to respond to a GET / with "OK"
+		responseProvider.expect(Method.GET, "/", httpMessageHeaders).respondWith(200, "text/plain", "OK");
+
+		final HttpGet req = new HttpGet(PROXY_URL + "/");
+		final HttpResponse response = client.execute(req);
+		final String responseBody = IOUtils.toString(response.getEntity().getContent());
+		final int statusCode = response.getStatusLine().getStatusCode();
+
+		// Then the response is "OK"
+		assertEquals("OK", responseBody);
+		// And the status code is 200
+		assertEquals(200, statusCode);
+
+		final FullHttpRequestImpl expectedRequest = new FullHttpRequestImpl();
+		expectedRequest.method(Method.GET);
+		expectedRequest.path("/");
+		expectedRequest.httpMessageHeader("Connection", "Keep-Alive");
+		expectedRequest.httpMessageHeader("Host", "localhost:51234");
+		expectedRequest.httpMessageHeader("User-Agent", "Apache-HttpClient/4.2.5 (java 1.5)");
+		expectedRequest.port(-1);
+
+		Set<HttpMessageHeader> httpMessageHeaders = new HashSet<HttpMessageHeader>();
+		httpMessageHeaders.add(new HttpMessageHeader("Connection", "keep-alive"));
+		httpMessageHeaders.add(new HttpMessageHeader("Content-Type", "text/plain"));
+		httpMessageHeaders.add(new HttpMessageHeader("Transfer-Encoding", "chunked"));
+		final HttpResponseImpl expectedResponse = new HttpResponseImpl(200, "text/plain", "OK".getBytes(),
+				httpMessageHeaders);
+
+		final InOrder inOrder = inOrder(mockLoggerFactory, mockLogger);
+		inOrder.verify(mockLoggerFactory).getHttpRequestResponseLogger();
+		inOrder.verify(mockLogger).log(expectedRequest);
+		inOrder.verify(mockLogger).log(expectedResponse);
+		verifyNoMoreInteractions(mockLogger, mockLoggerFactory, mockLogger);
+
+	}
 
 }

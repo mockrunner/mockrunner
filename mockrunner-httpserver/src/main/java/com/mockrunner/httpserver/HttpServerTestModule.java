@@ -15,8 +15,10 @@ import com.github.kristofa.test.http.AllExceptOriginalHeadersFilter;
 import com.github.kristofa.test.http.DefaultHttpResponseProvider;
 import com.github.kristofa.test.http.DefaultHttpResponseProxy;
 import com.github.kristofa.test.http.HttpRequestImpl;
+import com.github.kristofa.test.http.HttpRequestResponseLogger;
 import com.github.kristofa.test.http.HttpRequestResponseLoggerFactory;
 import com.github.kristofa.test.http.HttpResponseImpl;
+import com.github.kristofa.test.http.HttpResponseProxy;
 import com.github.kristofa.test.http.Method;
 import com.github.kristofa.test.http.MockAndProxyFacade;
 import com.github.kristofa.test.http.PassthroughForwardHttpRequestBuilder;
@@ -185,6 +187,7 @@ public class HttpServerTestModule {
 
 	private static final String CONTENT_TYPE_HTTP_HEADER_NAME = "Content-Type";
 	private HttpRequestImpl latestRequest;
+	private HttpResponseProxy latestResponse;
 
 	public HttpServerTestModule expect(final Method method, final String path, final String contentType,
 			final String requestEntity) {
@@ -213,15 +216,15 @@ public class HttpServerTestModule {
 		return this;
 	}
 
-	public HttpServerTestModule respondWith(final int httpCode, final String contentType, final String requestEntity) {
+	public HttpServerTestModule respondWith(final int httpCode, final String contentType, final String responseEntity) {
 		if (HttpServerConfig.Mode.LOGGING.equals(this.config.getModel())) {
 			throw new IllegalStateException("LOGGING mode unsupports this method");
 		}
 
 		final HttpResponseImpl response = new HttpResponseImpl(httpCode, contentType,
-				requestEntity == null ? null : requestEntity.getBytes());
-		responseProvider.addExpected(latestRequest, new DefaultHttpResponseProxy(response),
-				this.config.isOverrideFile());
+				responseEntity == null ? null : responseEntity.getBytes());
+		latestResponse = new DefaultHttpResponseProxy(response);
+		responseProvider.addExpected(latestRequest, latestResponse, this.config.isOverrideFile());
 		return this;
 	}
 
@@ -291,7 +294,27 @@ public class HttpServerTestModule {
 		Validate.isTrue(respFile.exists(), "respond file " + respFileName + " is not exists");
 		CustFileHttpResponseProxy responseProxy = new CustFileHttpResponseProxy(respFileName, respEntityFileName,
 				this.responseFileReader);
-		responseProvider.addExpected(latestRequest, responseProxy);
+		latestResponse = responseProxy;
+		responseProvider.addExpected(latestRequest, latestResponse);
 		return this;
+	}
+
+	public void saveToFile(String fileName) {
+		if (HttpServerConfig.Mode.LOGGING.equals(this.config.getModel())) {
+			throw new IllegalStateException("LOGGING mode unsupports this method");
+		}
+
+		if (latestRequest == null) {
+			throw new IllegalStateException("latestRequest is null");
+		}
+
+		HttpRequestResponseLoggerFactory loggerFactory = new HttpRequestResponseFileLoggerFactory(
+				this.config.getRequestFileDir(), fileName);
+		HttpRequestResponseLogger logger = loggerFactory.getHttpRequestResponseLogger();
+		logger.log(latestRequest);
+		// only log the function response, no file reponse
+		if (latestResponse != null && latestResponse instanceof DefaultHttpResponseProxy) {
+			logger.log(latestResponse.getResponse());
+		}
 	}
 }

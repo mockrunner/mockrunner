@@ -9,6 +9,7 @@ import org.apache.commons.io.FileUtils;
 
 import com.github.kristofa.test.http.AbstractHttpResponseProvider;
 import com.github.kristofa.test.http.HttpRequest;
+import com.github.kristofa.test.http.HttpRequestMatcher;
 import com.github.kristofa.test.http.file.FileHttpResponseProxy;
 import com.github.kristofa.test.http.file.FileNameBuilder;
 import com.github.kristofa.test.http.file.HttpRequestFileReader;
@@ -25,6 +26,17 @@ public class CustFileNameFileHttpResponseProvider extends AbstractHttpResponsePr
 	private final HttpResponseFileReader httpResponseFileReader;
 	private final boolean ignoreFileErrors;
 
+	public CustFileNameFileHttpResponseProvider(final String directory, final HttpRequestMatcher matcher,
+			String... fileNames) {
+		this(directory, matcher, new HttpRequestFileReaderImpl(), new HttpResponseFileReaderImpl(), false, fileNames);
+	}
+
+	public CustFileNameFileHttpResponseProvider(final String directory, final HttpRequestMatcher matcher,
+			final boolean ignoreFileErrors, String... fileNames) {
+		this(directory, matcher, new HttpRequestFileReaderImpl(), new HttpResponseFileReaderImpl(), ignoreFileErrors,
+				fileNames);
+	}
+
 	public CustFileNameFileHttpResponseProvider(final String directory, String... fileNames) {
 		this(directory, new HttpRequestFileReaderImpl(), new HttpResponseFileReaderImpl(), false, fileNames);
 	}
@@ -32,6 +44,19 @@ public class CustFileNameFileHttpResponseProvider extends AbstractHttpResponsePr
 	public CustFileNameFileHttpResponseProvider(final String directory, final boolean ignoreFileErrors,
 			String... fileNames) {
 		this(directory, new HttpRequestFileReaderImpl(), new HttpResponseFileReaderImpl(), ignoreFileErrors, fileNames);
+	}
+
+	public CustFileNameFileHttpResponseProvider(final String directory, final HttpRequestMatcher matcher,
+			final HttpRequestFileReader requestFileReader, final HttpResponseFileReader responseFileReader,
+			final boolean ignoreFileErrors, String... fileNames) {
+		super(matcher);
+		this.directory = directory;
+		httpRequestFileReader = requestFileReader;
+		httpResponseFileReader = responseFileReader;
+		if (fileNames != null) {
+			this.fileNames = new ArrayList<String>(Arrays.asList(fileNames));
+		}
+		this.ignoreFileErrors = ignoreFileErrors;
 	}
 
 	public CustFileNameFileHttpResponseProvider(final String directory, final HttpRequestFileReader requestFileReader,
@@ -57,8 +82,14 @@ public class CustFileNameFileHttpResponseProvider extends AbstractHttpResponsePr
 					"No saved http request/responses found. File " + requestFile.getPath() + " not found.");
 		}
 		for (File aFile : FileUtils.listFiles(requestFile, new String[] { "txt" }, false)) {
+			// first simple filter the file, then use the regular expression
+			// matcher
 			if (aFile.getName().contains("_request_")) {
 				String[] fileInfos = FileNameUtils.extractFileInfo(aFile.getName(), "request");
+				if (fileInfos == null) {
+					continue;
+				}
+
 				String fileName = fileInfos[0];
 				if (this.fileNames != null && this.fileNames.size() > 0) {
 					boolean isContain = false;

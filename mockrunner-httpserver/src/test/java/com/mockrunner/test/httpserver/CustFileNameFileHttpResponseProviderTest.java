@@ -46,7 +46,7 @@ public class CustFileNameFileHttpResponseProviderTest {
 	public void testCustFileNameFileHttpResponseProvider_NoResponseFileFound() {
 		try {
 			final CustFileNameFileHttpResponseProvider custFileNameFileHttpResponseProvider = new CustFileNameFileHttpResponseProvider(
-					TEST_FILE_DIRECTORY);
+					TEST_FILE_DIRECTORY, "ExpectedHttpResponseFileProviderTest_No_Response");
 			final HttpRequest mockRequest = mock(HttpRequest.class);
 			custFileNameFileHttpResponseProvider.getResponse(mockRequest);
 			fail("Expected exception.");

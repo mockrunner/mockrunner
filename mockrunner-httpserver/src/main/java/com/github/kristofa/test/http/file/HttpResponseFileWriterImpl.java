@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import com.github.kristofa.test.http.HttpMessageHeader;
 import com.github.kristofa.test.http.HttpResponse;
 
 public class HttpResponseFileWriterImpl implements HttpResponseFileWriter {
@@ -34,6 +35,16 @@ public class HttpResponseFileWriterImpl implements HttpResponseFileWriter {
 			writer.newLine();
 			writer.write(String.valueOf(httpResponse.getHttpCode()));
 			writer.newLine();
+
+			if (httpResponse.getHttpMessageHeaders().size() > 0) {
+				writer.write("[HttpMessageHeader]");
+				writer.newLine();
+
+				for (final HttpMessageHeader header : httpResponse.getHttpMessageHeaders()) {
+					writer.write(header.getName() + "=" + header.getValue());
+					writer.newLine();
+				}
+			}
 
 			writer.write("[ContentType]");
 			writer.newLine();

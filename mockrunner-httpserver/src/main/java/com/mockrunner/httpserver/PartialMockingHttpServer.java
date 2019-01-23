@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import com.github.kristofa.test.http.AbstractHttpResponseProvider;
 import com.github.kristofa.test.http.ForwardHttpRequestBuilder;
 import com.github.kristofa.test.http.FullHttpRequest;
+import com.github.kristofa.test.http.HttpMessageHeader;
 import com.github.kristofa.test.http.HttpRequest;
 import com.github.kristofa.test.http.HttpRequestImpl;
 import com.github.kristofa.test.http.HttpRequestResponseLogger;
@@ -93,6 +94,10 @@ public class PartialMockingHttpServer {
 					if (!StringUtils.isEmpty(expectedResponse.getContentType())) {
 						response.set("Content-Type", expectedResponse.getContentType());
 					}
+					// copy the response headers
+					for (HttpMessageHeader aHeader : expectedResponse.getHttpMessageHeaders()) {
+						response.set(aHeader.getName(), aHeader.getValue());
+					}
 					OutputStream body = null;
 					try {
 						body = response.getOutputStream();
@@ -154,7 +159,8 @@ public class PartialMockingHttpServer {
 							}
 
 							final HttpResponse httpResponse = new HttpResponseImpl(forwardResponse.getHttpCode(),
-									forwardResponse.getContentType(), responseEntity);
+									forwardResponse.getContentType(), responseEntity,
+									forwardResponse.getHttpMessageHeaders());
 							if (logger != null) {
 								LOGGER.debug("Logging response");
 								logger.log(httpResponse);

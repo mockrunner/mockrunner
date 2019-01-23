@@ -126,12 +126,19 @@ public class LoggingHttpProxy {
 								inputStream.close();
 							}
 							final HttpResponse httpResponse = new HttpResponseImpl(forwardResponse.getHttpCode(),
-									forwardResponse.getContentType(), responseEntity);
+									forwardResponse.getContentType(), responseEntity,
+									forwardResponse.getHttpMessageHeaders());
 							LOGGER.debug("Logging response");
 							logger.log(httpResponse);
 
 							response.setCode(forwardResponse.getHttpCode());
+							// copy the response headers
 							response.set(CONTENT_TYPE, forwardResponse.getContentType());
+							for (HttpMessageHeader aHeader : forwardResponse.getHttpMessageHeaders()) {
+								if (!CONTENT_TYPE.equals(aHeader.getName())) {
+									response.set(aHeader.getName(), aHeader.getValue());
+								}
+							}
 							final OutputStream outputStream = response.getOutputStream();
 							try {
 								final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
