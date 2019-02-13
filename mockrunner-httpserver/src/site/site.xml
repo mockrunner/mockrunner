@@ -4,7 +4,7 @@
 
 		<breadcrumbs>
 			<item name="Home" href="/index.html"/>
-			<item name="Servlets" href="/mockrunner-servlet/index.html"/>
+			<item name="Servlets" href="/mockrunner-httpserver/index.html"/>
 		</breadcrumbs>
 
 		<menu ref="parent" />

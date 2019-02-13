@@ -1,3 +1,6 @@
+mockrunner-1.2.0:
+- Add the http server mock support.
+
 mockrunner-0.4.7:
 - Reorganization of the modules and shift dependencies from the core module.
 
