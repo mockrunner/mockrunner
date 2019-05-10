@@ -11,7 +11,7 @@
 
     <groupId>com.mockrunner</groupId>
     <artifactId>mockrunner</artifactId>
-    <version>1.1.4-SNAPSHOT</version>
+    <version>1.2.0</version>
     <packaging>pom</packaging>
     <name>MockRunner</name>
     <url>http://mockrunner.github.io</url>
@@ -38,7 +38,7 @@
             <timezone>Europe/Berlin</timezone>
         </developer>
     </developers>
-	
+
     <contributors>
         <contributor>
             <name>Steinar Bang</name>
@@ -354,7 +354,7 @@
 
             </plugins>
         </pluginManagement>
-		
+
         <plugins>
             <plugin>
                 <!-- Also generate a jar for the test binaries when packaging a jar module -->
@@ -486,7 +486,7 @@
 
     <modules>
         <module>mockrunner-core</module>
-        <!-- These modules are not supported at the moment 
+        <!-- These modules are not supported at the moment
        <module>mockrunner-j2ee_1_3</module>
        <module>mockrunner-j2ee_1_4</module>
        <module>mockrunner-jdk_1_3</module>
@@ -500,5 +500,6 @@
         <module>mockrunner-tag</module>
         <module>mockrunner-struts</module>
         <module>mockrunner-all</module>
+        <module>mockrunner-httpserver</module>
     </modules>
 </project>

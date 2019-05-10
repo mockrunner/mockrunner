@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.mockrunner</groupId>
 		<artifactId>mockrunner</artifactId>
-		<version>1.1.4-SNAPSHOT</version>
+		<version>1.2.0</version>
 		<relativePath>..</relativePath>
 	</parent>
 
@@ -14,26 +14,26 @@
 	<description>Core classes common to all Mockrunner modules</description>
 
 	<dependencies>
-	
+
 		<!-- needed in multiple classes -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
-		
+
 		<!-- needed in StreamUtil -->
 		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 			<optional>true</optional>
 		</dependency>
-		
+
 		<!-- needed for XML Util -->
 		<dependency>
 			<groupId>jdom</groupId>
 			<artifactId>jdom</artifactId>
 		</dependency>
-		
+
 		<!-- needed for StringUtil (Perl5Compiler) -->
 		<dependency>
 			<groupId>oro</groupId>
