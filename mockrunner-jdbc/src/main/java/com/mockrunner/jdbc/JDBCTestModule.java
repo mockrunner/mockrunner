@@ -659,6 +659,10 @@ public class JDBCTestModule
         
         for(Entry<ParameterReference, Object> expectedParam : parameterMap.entrySet()){
           Object nextExpectedParameter = expectedParam.getValue();
+          if(!actualParameterMap.containsKey(expectedParam.getKey()))
+          {
+              throw new VerifyFailedException("No parameter " + expectedParam.getKey() + " found.");
+          }
           Object nextActualParameter = actualParameterMap.get(expectedParam.getKey());
           if(!ParameterUtil.compareParameter(nextExpectedParameter, nextActualParameter))
           {
@@ -687,6 +691,10 @@ public class JDBCTestModule
     public void verifySQLStatementParameter(String sql, int indexOfParameterSet, int indexOfParameter, Object expectedParameter)
     {
         MockParameterMap actualParameterMap = verifyAndGetParametersForSQL(sql, indexOfParameterSet);
+        if(!actualParameterMap.contains(indexOfParameter))
+        {
+            throw new VerifyFailedException("No parameter " + indexOfParameter + " found.");
+        }
         Object actualParameter = actualParameterMap.get(indexOfParameter);
         if(!ParameterUtil.compareParameter(expectedParameter, actualParameter))
         {
@@ -714,6 +722,10 @@ public class JDBCTestModule
     public void verifySQLStatementParameter(String sql, int indexOfParameterSet, String nameOfParameter, Object expectedParameter)
     {
         MockParameterMap actualParameterMap = verifyAndGetParametersForSQL(sql, indexOfParameterSet);
+        if(!actualParameterMap.contains(nameOfParameter))
+        {
+            throw new VerifyFailedException("No parameter " + nameOfParameter + " found.");
+        }
         Object actualParameter = actualParameterMap.get(nameOfParameter);
         if(!ParameterUtil.compareParameter(expectedParameter, actualParameter))
         {

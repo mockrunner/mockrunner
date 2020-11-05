@@ -48,6 +48,10 @@ public class MockParameterMap extends HashMap<ParameterReference, Object> {
         return get(new ParameterIndex(index));
     }
     
+    public boolean contains(int index){
+      return containsKey(new ParameterIndex(index));
+    }
+    
 //    @Deprecated
 //    public void put(Integer index, Object value){
 //        put(new ParameterIndex(index), value);
@@ -70,6 +74,10 @@ public class MockParameterMap extends HashMap<ParameterReference, Object> {
     public Object get(String name){
         return get(new ParameterName(name));
     }
+    
+    public boolean contains(String name){
+      return containsKey(new ParameterName(name));
+  }
     
     public Object remove(int index){
         return remove(new ParameterIndex(index));
