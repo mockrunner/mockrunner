@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import com.mockrunner.base.NestedApplicationException;
@@ -656,17 +657,13 @@ public class JDBCTestModule
         verifySQLStatementParameterNumber(sql, indexOfParameterSet, parameterMap.size());
         MockParameterMap actualParameterMap = verifyAndGetParametersForSQL(sql, indexOfParameterSet);
         
-        for(ParameterReference key : parameterMap.keySet()){
-            Object nextExpectedParameter = parameterMap.get(key);
-            Object nextActualParameter = actualParameterMap.get(key);
-            if(null == nextActualParameter)
-            {
-                throw new VerifyFailedException("No parameter " + key + " found.");
-            }
-            if(!ParameterUtil.compareParameter(nextExpectedParameter, nextActualParameter))
-            {
-                throw new VerifyFailedException("Expected " + nextExpectedParameter + " for parameter " + key + ", but was " + nextActualParameter);
-            }
+        for(Entry<ParameterReference, Object> expectedParam : parameterMap.entrySet()){
+          Object nextExpectedParameter = expectedParam.getValue();
+          Object nextActualParameter = actualParameterMap.get(expectedParam.getKey());
+          if(!ParameterUtil.compareParameter(nextExpectedParameter, nextActualParameter))
+          {
+                throw new VerifyFailedException("Expected " + nextExpectedParameter + " for parameter " + expectedParam.getKey() + ", but was " + nextActualParameter);
+          }
         }
     }
     

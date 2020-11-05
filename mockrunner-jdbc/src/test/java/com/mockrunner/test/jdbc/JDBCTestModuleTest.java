@@ -8,6 +8,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.Savepoint;
 import java.sql.Statement;
@@ -1256,6 +1257,27 @@ public class JDBCTestModuleTest
 			//should throw exception
 		}
 	}
+    
+    @Test
+  public void testSQLStatementParameterMockParameterMapWithNullValues() throws Exception
+  {
+    prepareCallableStatements();
+    module.getCallableStatement(0).setString(1, "test1");
+    module.getCallableStatement(0).setString(2, null);
+    module.getCallableStatement(0).setBoolean(3, Boolean.TRUE);
+    module.getCallableStatement(0).setBigDecimal(4, BigDecimal.ZERO);
+    module.getCallableStatement(0).execute();
+    MockParameterMap testMap = new MockParameterMap();
+    testMap.put(1, "test1");
+    testMap.put(2, null);
+    testMap.put(3, Boolean.TRUE);
+    testMap.put(4,  BigDecimal.ZERO);
+    module.verifySQLStatementParameter("{call getData(?, ?, ?, ?)}", 0, testMap);
+    module.verifySQLStatementParameter("{call getData(?, ?, ?, ?)}", 0, 1, "test1");
+    module.verifySQLStatementParameter("{call getData(?, ?, ?, ?)}", 0, 2, null);
+    module.verifySQLStatementParameter("{call getData(?, ?, ?, ?)}", 0, 3, Boolean.TRUE);
+    module.verifySQLStatementParameter("{call getData(?, ?, ?, ?)}", 0, 4, BigDecimal.ZERO);
+  }
     
     @Test
     public void testSQLStatementParameterPreparedStatementBatchParameterSets() throws Exception
