@@ -42,6 +42,11 @@
 			<version>3.3.0</version>
 		</dependency>
 		<dependency>
+			<groupId>org.jacorb</groupId>
+			<artifactId>jacorb</artifactId>
+			<version>3.9</version>
+		</dependency>
+		<dependency>
 			<groupId>jboss</groupId>
 			<artifactId>jboss-j2ee</artifactId>
 			<optional>true</optional>
