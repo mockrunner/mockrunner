@@ -32,7 +32,7 @@
             <timezone>Europe/Berlin</timezone>
         </developer>
     </developers>
-	
+
     <contributors>
         <contributor>
             <name>Steinar Bang</name>
@@ -316,7 +316,7 @@
                 <plugin>
                     <groupId>org.apache.karaf.tooling</groupId>
                     <artifactId>karaf-maven-plugin</artifactId>
-                    <version>4.1.7</version>
+                    <version>4.4.6</version>
                     <extensions>true</extensions>
                     <configuration>
                         <startLevel>80</startLevel>
@@ -429,7 +429,7 @@
 
             </plugins>
         </pluginManagement>
-		
+
         <plugins>
             <plugin>
                 <!-- Also generate a jar for the test binaries when packaging a jar module -->
@@ -572,7 +572,7 @@
 
     <modules>
         <module>mockrunner-core</module>
-        <!-- These modules are not supported at the moment 
+        <!-- These modules are not supported at the moment
        <module>mockrunner-j2ee_1_3</module>
        <module>mockrunner-j2ee_1_4</module>
        <module>mockrunner-jdk_1_3</module>
