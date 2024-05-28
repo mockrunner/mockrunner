@@ -29,11 +29,32 @@
 		<dependency>
 			<groupId>org.mockejb</groupId>
 			<artifactId>mockejb</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>cglib</groupId>
+					<artifactId>cglib-full</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib-nodep</artifactId>
+			<version>3.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jacorb</groupId>
+			<artifactId>jacorb</artifactId>
+			<version>3.9</version>
 		</dependency>
 		<dependency>
 			<groupId>jboss</groupId>
 			<artifactId>jboss-j2ee</artifactId>
 			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.spec.javax.rmi</groupId>
+			<artifactId>jboss-rmi-api_1.0_spec</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -75,9 +96,16 @@
 					<additionalOptions>-Xdoclint:none</additionalOptions>
 				</configuration>
 			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+					<argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
-	
+
 	<profiles>
 		<profile>
 			<id>release-module-exclusives</id>
