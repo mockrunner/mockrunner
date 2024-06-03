@@ -32,7 +32,7 @@ public class LogAction extends Action
             {
                 InitialContext initialContext = new InitialContext();
                 Object home = initialContext.lookup("com/mockrunner/example/LogSession");
-                LogSessionHome logHome = (LogSessionHome)PortableRemoteObject.narrow(home, LogSessionHome.class);
+                LogSessionHome logHome = (LogSessionHome) PortableRemoteObject.narrow(home, LogSessionHome.class);
                 LogSession log = logHome.create();
                 log.logMessage(message);
                 log.remove();
