@@ -2,12 +2,12 @@
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd">
     <servers>
         <server>
-            <id>ossrh</id>
+            <id>central</id>
             <username>${env.NEXUS_USERNAME}</username>
             <password>${env.NEXUS_PASSWORD}</password>
         </server>
         <server>
-            <id>sonatype-nexus-staging</id>
+            <id>central-staging</id>
             <username>${env.NEXUS_USERNAME}</username>
             <password>${env.NEXUS_PASSWORD}</password>
         </server>
@@ -22,12 +22,11 @@
             </properties>
         </profile>
         <profile>
-            <id>sonatype-staging</id>
+            <id>central-portal</id>
             <repositories>
                 <repository>
-                    <id>ossrh</id>
-                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-                    <layout>default</layout>
+                    <id>central</id>
+                    <url>https://central.sonatype.com</url>
                     <releases>
                         <enabled>true</enabled>
                     </releases>
@@ -37,6 +36,6 @@
     </profiles>
     <activeProfiles>
         <activeProfile>gpg</activeProfile>
-        <activeProfile>sonatype-staging</activeProfile>
+        <activeProfile>central-portal</activeProfile>
     </activeProfiles>
 </settings>
